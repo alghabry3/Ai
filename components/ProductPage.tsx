@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, Heart, Share2, Star, Clock, Flame, Minus, Plus } from 'lucide-react';
+import { ArrowRight, Heart, Share2, Star, Clock, Flame, Minus, Plus, Zap } from 'lucide-react';
 import { Product } from '../types';
 
 interface ProductPageProps {
@@ -145,8 +145,19 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack, onAdd
 
       {/* Footer Actions */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 pb-8 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
-        <div className="flex gap-4">
-           <div className="flex items-center gap-3 bg-slate-100 rounded-xl px-4 py-2">
+        <div className="flex gap-3">
+           {/* Quick Add Button */}
+           <button 
+             onClick={() => onAddToCart(product, 1)}
+             className="w-14 rounded-xl bg-amber-50 border border-amber-100 text-amber-700 flex flex-col items-center justify-center gap-0.5 hover:bg-amber-100 active:scale-95 transition-all"
+             title="إضافة سريعة (١)"
+           >
+             <Zap className="w-5 h-5 fill-amber-500" />
+             <span className="text-[10px] font-bold leading-none">1+</span>
+           </button>
+
+           {/* Quantity Selector */}
+           <div className="flex items-center gap-3 bg-slate-100 rounded-xl px-3 py-2">
              <button 
                onClick={decrement}
                disabled={quantity <= 1}
@@ -154,7 +165,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack, onAdd
              >
                <Minus className="w-4 h-4" />
              </button>
-             <span className="font-bold text-slate-900 w-6 text-center text-lg">{quantity}</span>
+             <span className="font-bold text-slate-900 w-4 text-center text-lg">{quantity}</span>
              <button 
                onClick={increment}
                className="w-8 h-8 flex items-center justify-center rounded-lg bg-white shadow-sm text-slate-700 hover:bg-slate-50 active:scale-95 transition-all"
@@ -162,11 +173,14 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack, onAdd
                <Plus className="w-4 h-4" />
              </button>
            </div>
+
+           {/* Main Add Button */}
            <button 
              onClick={() => onAddToCart(product, quantity)}
-             className="flex-1 bg-slate-900 text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200"
+             className="flex-1 bg-slate-900 text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200 flex flex-col items-center justify-center leading-none gap-1"
            >
-             إضافة للسلة - {product.price * quantity} ر.س
+             <span>إضافة للسلة</span>
+             <span className="text-xs font-normal text-slate-300">{product.price * quantity} ر.س</span>
            </button>
         </div>
       </div>
