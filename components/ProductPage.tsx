@@ -12,8 +12,20 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack, onAdd
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-  const increment = () => setQuantity(q => q + 1);
-  const decrement = () => setQuantity(q => Math.max(1, q - 1));
+  const triggerHaptic = (ms: number = 10) => {
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(ms);
+    }
+  };
+
+  const increment = () => {
+    setQuantity(q => q + 1);
+    triggerHaptic(5);
+  };
+  const decrement = () => {
+    setQuantity(q => Math.max(1, q - 1));
+    triggerHaptic(5);
+  };
 
   // Determine images to display
   const images = product.images && product.images.length > 0 
@@ -167,7 +179,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack, onAdd
         <div className="flex gap-3">
            {/* Quick Add Button */}
            <button 
-             onClick={() => onAddToCart(product, 1)}
+             onClick={() => { onAddToCart(product, 1); triggerHaptic(15); }}
              className="w-14 rounded-xl bg-amber-50 border border-amber-100 text-amber-700 flex flex-col items-center justify-center gap-0.5 hover:bg-amber-100 active:scale-95 transition-all"
              title="إضافة سريعة (١)"
            >
@@ -195,7 +207,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack, onAdd
 
            {/* Main Add Button */}
            <button 
-             onClick={() => onAddToCart(product, quantity)}
+             onClick={() => { onAddToCart(product, quantity); triggerHaptic(20); }}
              className="flex-1 bg-slate-900 text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200 flex flex-col items-center justify-center leading-none gap-1"
            >
              <span>إضافة للسلة</span>

@@ -14,60 +14,149 @@ import {
   User as UserIcon, 
   Home, 
   Heart, 
-  Mic
+  Mic,
+  Store
 } from 'lucide-react';
 import { Product, Category, Seller, User, CartItem, Order, UserRole } from './types';
 
-// --- MOCK INITIAL DATA ---
+// --- MOCK INITIAL DATA (PRODUCTIVE FAMILIES THEME) ---
+
 const INITIAL_CATEGORIES: Category[] = [
-  { id: '1', nameAr: 'برجر', icon: '🍔' },
-  { id: '2', nameAr: 'بيتزا', icon: '🍕' },
-  { id: '3', nameAr: 'شاورما', icon: '🥙' },
-  { id: '4', nameAr: 'آسيوي', icon: '🍣' },
-  { id: '5', nameAr: 'حلويات', icon: '🍩' },
+  { id: 'cat1', nameAr: 'أطباق شعبية', icon: '🥘' },
+  { id: 'cat2', nameAr: 'حلويات ومعجنات', icon: '🧁' },
+  { id: 'cat3', nameAr: 'مفرزنات', icon: '❄️' },
+  { id: 'cat4', nameAr: 'بهارات وقهوة', icon: '☕' },
+  { id: 'cat5', nameAr: 'أكل صحي', icon: '🥗' },
 ];
 
 const INITIAL_SELLERS: Seller[] = [
-  { id: '1', nameAr: 'برجر كنج', cuisine: 'وجبات سريعة', deliveryTime: '25-35 دقيقة', rating: 4.5, image: 'https://picsum.photos/seed/burger/400/250' },
-  { id: '2', nameAr: 'بيتزا هت', cuisine: 'إيطالي', deliveryTime: '30-45 دقيقة', rating: 4.2, image: 'https://picsum.photos/seed/pizza/400/250' },
-  { id: '3', nameAr: 'شاورما كلاسيك', cuisine: 'عربي', deliveryTime: '15-25 دقيقة', rating: 4.8, image: 'https://picsum.photos/seed/shawarma/400/250' },
+  { 
+    id: 's1', 
+    nameAr: 'مطبخ أم عبد الله', 
+    cuisine: 'أكلات سعودية أصيلة', 
+    deliveryTime: '60-90 دقيقة', 
+    rating: 4.9, 
+    image: 'https://images.unsplash.com/photo-1547924475-f9e25c02c05e?auto=format&fit=crop&q=80&w=800' 
+  },
+  { 
+    id: 's2', 
+    nameAr: 'حلويات شهد المنزلية', 
+    cuisine: 'كيك وحلويات شرقية', 
+    deliveryTime: '45-60 دقيقة', 
+    rating: 4.7, 
+    image: 'https://images.unsplash.com/photo-1579372786545-d24232daf58c?auto=format&fit=crop&q=80&w=800' 
+  },
+  { 
+    id: 's3', 
+    nameAr: 'تجهيزات أم ريان', 
+    cuisine: 'مفرزنات وسمبوسة', 
+    deliveryTime: 'يوم عمل', 
+    rating: 4.8, 
+    image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&q=80&w=800' 
+  },
+  { 
+    id: 's4', 
+    nameAr: 'نكهات صحية (دايت)', 
+    cuisine: 'وجبات صحية وكيتو', 
+    deliveryTime: '30-45 دقيقة', 
+    rating: 4.6, 
+    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=800' 
+  },
 ];
 
 const INITIAL_PRODUCTS: Product[] = [
+  // Seller 1: Um Abdullah
   { 
-    id: '1', 
-    nameAr: 'وجبة دجاج عائلي', 
-    descriptionAr: '١٢ قطعة دجاج + بطاطس + كولا', 
-    price: 85, 
-    image: 'https://picsum.photos/seed/chicken/600/600', 
+    id: 'p1', 
+    nameAr: 'جريش أحمر باللحم', 
+    descriptionAr: 'جريش نجد الأصلي باللحم البلدي والمسمنة', 
+    price: 45, 
+    image: 'https://images.unsplash.com/photo-1547924475-f9e25c02c05e?auto=format&fit=crop&q=80&w=800', 
     images: [
-      'https://picsum.photos/seed/chicken/600/600',
-      'https://picsum.photos/seed/chicken2/600/600',
-      'https://picsum.photos/seed/chicken3/600/600'
+      'https://images.unsplash.com/photo-1547924475-f9e25c02c05e?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=800'
     ],
-    rating: 4.7,
-    longDescriptionAr: 'استمتع بوجبة عائلية متكاملة تكفي الجميع! ١٢ قطعة من الدجاج المقرمش المتبل بخلطتنا السرية، يقدم مع بطاطس ذهبية مقلية ومشروب كولا عائلي بارد. الخيار الأمثل للتجمعات.',
-    ingredientsAr: ['دجاج طازج', 'دقيق القمح', 'توابل خاصة', 'زيت نباتي', 'بطاطس', 'ملح'],
-    nutrition: { calories: 1200, protein: '45g', carbs: '110g', fats: '55g' },
-    sellerId: '1',
-    categoryId: '1'
+    rating: 4.9,
+    longDescriptionAr: 'وجبة الجريش النجدي الأحمر الفاخر، مطبوخ بعناية فائقة لمدة ٦ ساعات مع اللحم النعيمي الطازج. يقدم مع "المسمنة" الخاصة المكونة من البصل والليمون الأسود والبهارات النجدية. وجبة تكفي شخصين.',
+    ingredientsAr: ['قمح مجروش فاخر', 'لحم نعيمي طازج', 'لبن طازج', 'بصل', 'طماطم', 'بهارات مشكلة', 'سمن بري', 'ليمون أسود'],
+    nutrition: { calories: 650, protein: '35g', carbs: '80g', fats: '25g' },
+    sellerId: 's1',
+    categoryId: 'cat1'
   },
   { 
-    id: '2', 
-    nameAr: 'بيتزا سوبر سوبريم', 
-    descriptionAr: 'حجم كبير مع أطراف جبنة', 
-    price: 65, 
-    image: 'https://picsum.photos/seed/pizza2/600/600', 
+    id: 'p2', 
+    nameAr: 'ورق عنب بدبس الرمان', 
+    descriptionAr: 'بوكس ٢٠ حبة، حشوة الرز المصري والخضار', 
+    price: 35, 
+    image: 'https://images.unsplash.com/photo-1559381552-01994354c0e6?auto=format&fit=crop&q=80&w=800', 
     images: [
-      'https://picsum.photos/seed/pizza2/600/600',
-      'https://picsum.photos/seed/pizza3/600/600'
+      'https://images.unsplash.com/photo-1559381552-01994354c0e6?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1606509923238-769165d4486b?auto=format&fit=crop&q=80&w=800'
     ],
+    rating: 4.8,
+    longDescriptionAr: 'ورق عنب طازج ومحشي يدوياً بخلطة الأرز المصري والخضروات الطازجة، مطبوخ بصلصة الليمون وزيت الزيتون ودبس الرمان الأصلي. طعم يجمع بين الحموضة والحلاوة.',
+    ingredientsAr: ['ورق عنب طازج', 'أرز مصري', 'بقدونس', 'طماطم', 'بصل', 'زيت زيتون', 'دبس رمان', 'ليمون'],
+    nutrition: { calories: 150, protein: '3g', carbs: '25g', fats: '8g' },
+    sellerId: 's1',
+    categoryId: 'cat1'
+  },
+  
+  // Seller 2: Shahd Sweets
+  { 
+    id: 'p3', 
+    nameAr: 'تشيز كيك التوت', 
+    descriptionAr: 'قطعة غنية بصوص التوت الطبيعي', 
+    price: 22, 
+    image: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&q=80&w=800', 
+    rating: 4.7,
+    longDescriptionAr: 'تشيز كيك مخبوز على الطريقة الأمريكية، يتميز بقاعدة بسكويت مقرمشة وطبقة جبن كريمية غنية، مغطى بصوص التوت الأزرق والأحمر المحضر منزلياً.',
+    ingredientsAr: ['جبنة كريمية', 'بسكويت دايجستيف', 'زبدة', 'كريمة خفق', 'توت مشكل طازج', 'سكر', 'فانيليا'],
+    nutrition: { calories: 450, protein: '8g', carbs: '45g', fats: '28g' },
+    sellerId: 's2',
+    categoryId: 'cat2'
+  },
+  { 
+    id: 'p4', 
+    nameAr: 'بوكس معمول التمر الفاخر', 
+    descriptionAr: '١ كيلو، هش ويذوب بالفم', 
+    price: 80, 
+    image: 'https://images.unsplash.com/photo-1599785209796-786432b228bc?auto=format&fit=crop&q=80&w=800', 
+    rating: 4.9,
+    longDescriptionAr: 'معمول بيتي فاخر محشو بأجود أنواع تمر الإخلاص. يتميز بقوامه الهش الذي يذوب في الفم، محضر بالسمن البري والهيل.',
+    ingredientsAr: ['دقيق فاخر', 'تمر خلاص', 'سمن بري', 'هيل', 'محلب', 'سكر بودرة'],
+    nutrition: { calories: 380, protein: '4g', carbs: '60g', fats: '15g' },
+    sellerId: 's2',
+    categoryId: 'cat2'
+  },
+
+  // Seller 3: Um Rayan Frozen
+  { 
+    id: 'p5', 
+    nameAr: 'سمبوسة لحم (مفرزنات)', 
+    descriptionAr: 'بوكس ٥٠ حبة، عجينة بيتية مقرمشة', 
+    price: 60, 
+    image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&q=80&w=800', 
+    rating: 4.6,
+    longDescriptionAr: 'سمبوسة مفرزنة جاهزة للقلي، محضرة من عجينة بيتية رقيقة ومقرمشة. الحشوة تتكون من لحم غنم طازج مفروم مع البصل والشبت والبهارات الخاصة. الحل الأمثل لرمضان وللضيوف.',
+    ingredientsAr: ['دقيق', 'لحم غنم مفروم', 'بصل', 'شبت', 'كزبرة', 'بهارات مشكلة', 'ملح'],
+    nutrition: { calories: 90, protein: '6g', carbs: '10g', fats: '4g' },
+    sellerId: 's3',
+    categoryId: 'cat3'
+  },
+
+  // Seller 4: Healthy Flavors
+  { 
+    id: 'p6', 
+    nameAr: 'سلطة الكينوا مع الدجاج', 
+    descriptionAr: 'وجبة متكاملة صحية ومشبعة', 
+    price: 38, 
+    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=800', 
     rating: 4.5,
-    longDescriptionAr: 'بيتزا سوبر سوبريم الغنية بالمكونات! طبقة غنية من صلصة الطماطم وجبنة الموزاريلا، مغطاة بقطع البيبروني، اللحم المفروم، الفطر، الفلفل الأخضر، والزيتون الأسود. تأتيكم بأطراف محشوة بالجبنة اللذيذة.',
-    ingredientsAr: ['عجينة البيتزا', 'صلصة طماطم', 'جبنة موزاريلا', 'بيبروني', 'لحم بقري', 'فطر', 'فلفل أخضر', 'زيتون'],
-    nutrition: { calories: 280, protein: '12g', carbs: '35g', fats: '10g' },
-    sellerId: '2',
-    categoryId: '2'
+    longDescriptionAr: 'سلطة صحية منعشة تحتوي على الكينوا العضوية، صدور دجاج مشوية بالأعشاب، أفوكادو، طماطم كرزية، وخيار. تقدم مع صوص الليمون وزيت الزيتون.',
+    ingredientsAr: ['كينوا', 'صدور دجاج', 'أفوكادو', 'خيار', 'طماطم كرزية', 'خس', 'زيت زيتون', 'ليمون'],
+    nutrition: { calories: 320, protein: '28g', carbs: '22g', fats: '14g' },
+    sellerId: 's4',
+    categoryId: 'cat5'
   },
 ];
 
@@ -98,13 +187,19 @@ const App: React.FC = () => {
     // Add a demo driver and seller if empty
     if (users.length === 0) {
       setUsers([
-        { id: 'd1', name: 'سائق تجريبي', email: 'driver@demo.com', phone: '0500000000', role: 'driver' },
-        { id: 's1', name: 'مدير المطعم', email: 'seller@demo.com', phone: '0500000000', role: 'seller' }
+        { id: 'd1', name: 'خالد السائق', email: 'driver@demo.com', phone: '0501234567', role: 'driver' },
+        { id: 's1_owner', name: 'أم عبد الله', email: 'um_abdullah@demo.com', phone: '0507654321', role: 'seller' }
       ]);
     }
   }, []);
 
   // --- ACTIONS ---
+
+  const triggerHaptic = (ms: number = 10) => {
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(ms);
+    }
+  };
 
   const handleRegister = (user: User) => {
     setUsers([...users, user]);
@@ -189,7 +284,13 @@ const App: React.FC = () => {
   };
 
   const navigateToProduct = (product: Product) => {
+    triggerHaptic(10);
     setSelectedProduct(product);
+  };
+
+  const handleBottomNav = (view: AppView) => {
+    triggerHaptic(8);
+    setCurrentView(view);
   };
 
   // --- RENDERERS ---
@@ -254,7 +355,7 @@ const App: React.FC = () => {
             onStatusUpdate={updateOrderStatus}
          />
          {/* Bottom Nav visible in Profile */}
-         <BottomNav current={currentView} setView={setCurrentView} cartCount={cart.length} />
+         <BottomNav current={currentView} setView={handleBottomNav} cartCount={cart.length} />
       </div>
     );
   }
@@ -296,7 +397,7 @@ const App: React.FC = () => {
                  </div>
               </div>
               <button 
-                onClick={() => setCurrentView('cart')}
+                onClick={() => { triggerHaptic(8); setCurrentView('cart'); }}
                 className="p-2 bg-slate-100 rounded-full text-slate-600 hover:bg-slate-200 transition-colors relative"
               >
                  <ShoppingBag className="w-6 h-6" />
@@ -312,7 +413,7 @@ const App: React.FC = () => {
             <div className="relative">
               <input 
                 type="text" 
-                placeholder="ابحث عن مطعم أو وجبة..." 
+                placeholder="ابحث عن أكلة منزلية، حلويات..." 
                 className="w-full bg-slate-100 rounded-xl py-3 px-10 text-right text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all placeholder:text-slate-400"
               />
               <Search className="w-5 h-5 text-slate-400 absolute right-3 top-1/2 transform -translate-y-1/2" />
@@ -325,6 +426,7 @@ const App: React.FC = () => {
             {currentUser && currentUser.role !== 'customer' && (
                <div 
                  onClick={() => {
+                     triggerHaptic(10);
                      if (currentUser.role === 'admin') setCurrentView('admin');
                      else setCurrentView('profile');
                  }}
@@ -342,10 +444,14 @@ const App: React.FC = () => {
 
             {/* Categories */}
             <section>
-              <h2 className="text-lg font-bold text-slate-800 mb-4">التصنيفات</h2>
+              <h2 className="text-lg font-bold text-slate-800 mb-4">الأقسام</h2>
               <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
                 {categories.map(cat => (
-                  <div key={cat.id} className="flex-shrink-0 flex flex-col items-center gap-2 cursor-pointer group">
+                  <div 
+                    key={cat.id} 
+                    onClick={() => triggerHaptic(5)}
+                    className="flex-shrink-0 flex flex-col items-center gap-2 cursor-pointer group"
+                  >
                     <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-2xl border border-slate-100 group-hover:border-amber-500 group-hover:shadow-md transition-all">
                       {cat.icon}
                     </div>
@@ -358,7 +464,7 @@ const App: React.FC = () => {
             {/* Featured Sellers - Updated to Carousel */}
             <section>
               <div className="flex justify-between items-center mb-4">
-                 <h2 className="text-lg font-bold text-slate-800">مطاعم مميزة</h2>
+                 <h2 className="text-lg font-bold text-slate-800">أسر منتجة مميزة</h2>
                  <a href="#" className="text-sm text-amber-600 font-medium">عرض الكل</a>
               </div>
               
@@ -366,6 +472,7 @@ const App: React.FC = () => {
                 {sellers.map((seller, index) => (
                   <div 
                     key={seller.id} 
+                    onClick={() => triggerHaptic(8)}
                     className="flex-shrink-0 w-[85vw] sm:w-80 bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 snap-center group cursor-pointer"
                   >
                     <div className="relative h-44 w-full overflow-hidden">
@@ -394,7 +501,7 @@ const App: React.FC = () => {
                       </div>
                       <div className="flex justify-between items-center text-xs text-slate-500">
                          <p>{seller.cuisine}</p>
-                         <span className="text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded">توصيل مجاني</span>
+                         <span className="text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded">موثوق</span>
                       </div>
                     </div>
                   </div>
@@ -404,37 +511,43 @@ const App: React.FC = () => {
 
             {/* Popular Items */}
             <section>
-              <h2 className="text-lg font-bold text-slate-800 mb-4">الأكثر طلباً</h2>
+              <h2 className="text-lg font-bold text-slate-800 mb-4">أحدث الأطباق</h2>
               <div className="grid grid-cols-2 gap-4">
-                {products.map(product => (
-                  <div 
-                    key={product.id} 
-                    onClick={() => navigateToProduct(product)}
-                    className="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 cursor-pointer active:scale-95 transition-transform"
-                  >
-                    <div className="relative mb-3">
-                       <img src={product.image} alt={product.nameAr} className="w-full h-24 object-cover rounded-xl" />
-                       <button className="absolute top-1 right-1 p-1.5 bg-white/80 rounded-full text-slate-400 hover:text-red-500 hover:bg-white transition-all">
-                         <Heart className="w-4 h-4" />
-                       </button>
+                {products.map(product => {
+                  const seller = sellers.find(s => s.id === product.sellerId);
+                  return (
+                    <div 
+                      key={product.id} 
+                      onClick={() => navigateToProduct(product)}
+                      className="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 cursor-pointer active:scale-95 transition-transform"
+                    >
+                      <div className="relative mb-3">
+                        <img src={product.image} alt={product.nameAr} className="w-full h-28 object-cover rounded-xl" />
+                        <button className="absolute top-1 right-1 p-1.5 bg-white/80 rounded-full text-slate-400 hover:text-red-500 hover:bg-white transition-all">
+                          <Heart className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <h3 className="font-bold text-sm text-slate-800 line-clamp-1">{product.nameAr}</h3>
+                      <p className="text-[10px] text-slate-500 mt-1 flex items-center gap-1">
+                        <Store className="w-3 h-3" />
+                        {seller?.nameAr || 'أسرة منتجة'}
+                      </p>
+                      <div className="flex justify-between items-center mt-3">
+                        <span className="font-bold text-amber-600 text-sm">{product.price} ر.س</span>
+                        <button className="bg-slate-900 text-white w-6 h-6 rounded-lg flex items-center justify-center hover:bg-amber-500 transition-colors">
+                          +
+                        </button>
+                      </div>
                     </div>
-                    <h3 className="font-bold text-sm text-slate-800 line-clamp-1">{product.nameAr}</h3>
-                    <p className="text-xs text-slate-500 mt-1 line-clamp-1">{product.descriptionAr}</p>
-                    <div className="flex justify-between items-center mt-3">
-                      <span className="font-bold text-amber-600 text-sm">{product.price} ر.س</span>
-                      <button className="bg-slate-900 text-white w-6 h-6 rounded-lg flex items-center justify-center hover:bg-amber-500 transition-colors">
-                        +
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </section>
       </div>
 
       {/* Floating Action Button - Voice Assistant */}
       <button 
-        onClick={() => setIsVoiceModalOpen(true)}
+        onClick={() => { setIsVoiceModalOpen(true); triggerHaptic(15); }}
         className="fixed bottom-24 left-4 z-40 bg-gradient-to-tr from-amber-500 to-amber-400 text-white w-14 h-14 rounded-full shadow-xl shadow-amber-200 flex items-center justify-center hover:scale-110 transition-transform duration-200 group"
       >
         <div className="absolute inset-0 bg-white opacity-20 rounded-full animate-ping group-hover:animate-none"></div>
@@ -442,7 +555,7 @@ const App: React.FC = () => {
       </button>
 
       {/* Bottom Navigation */}
-      <BottomNav current={currentView} setView={setCurrentView} cartCount={cart.length} />
+      <BottomNav current={currentView} setView={handleBottomNav} cartCount={cart.length} />
     </div>
   );
 };
