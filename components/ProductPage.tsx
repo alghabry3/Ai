@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, Heart, Share2, Star, Clock, Flame, Minus, Plus, Zap } from 'lucide-react';
+import { ArrowRight, Heart, Share2, Star, Clock, Flame, Minus, Plus, Zap, MessageSquare } from 'lucide-react';
 import { Product } from '../types';
 
 interface ProductPageProps {
@@ -117,7 +117,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack, onAdd
 
         {/* Nutrition */}
         {product.nutrition && (
-          <div className="p-6">
+          <div className="p-6 border-b border-slate-100">
             <h2 className="text-lg font-bold text-slate-800 mb-3">القيمة الغذائية</h2>
             <div className="grid grid-cols-4 gap-3">
               <div className="bg-orange-50 rounded-2xl p-3 text-center border border-orange-100">
@@ -141,6 +141,25 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack, onAdd
              <p className="text-[10px] text-slate-400 mt-3 text-center">* القيم الغذائية تقريبية للحصة الواحدة</p>
           </div>
         )}
+
+        {/* Reviews Section */}
+        <div className="p-6 pb-28">
+           <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-bold text-slate-800">التقييمات</h2>
+              <button className="text-amber-600 text-sm font-bold hover:underline flex items-center gap-1">
+                 <MessageSquare className="w-4 h-4" />
+                 أضف تقييمك
+              </button>
+           </div>
+           
+           <div className="bg-slate-50 rounded-2xl p-8 text-center border border-slate-100 border-dashed">
+              <div className="inline-block p-3 bg-white rounded-full shadow-sm mb-3">
+                 <Star className="w-6 h-6 text-slate-300" />
+              </div>
+              <p className="text-slate-600 font-bold mb-1">لا توجد تقييمات بعد</p>
+              <p className="text-slate-400 text-xs">كن أول من يشاركنا رأيه في هذا المنتج!</p>
+           </div>
+        </div>
       </div>
 
       {/* Footer Actions */}
