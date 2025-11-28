@@ -19,9 +19,10 @@ import {
   Mic,
   Store,
   FilterX,
-  SlidersHorizontal
+  SlidersHorizontal,
+  ArrowRight
 } from 'lucide-react';
-import { Product, Category, Seller, User, CartItem, Order, UserRole } from './types';
+import { Product, Category, Seller, User, CartItem, Order, UserRole, Transaction } from './types';
 
 // --- MOCK INITIAL DATA (PRODUCTIVE FAMILIES THEME) ---
 
@@ -137,10 +138,9 @@ const INITIAL_PRODUCTS: Product[] = [
     sellerId: 's2',
     categoryId: 'cat2'
   },
-  // New Items for Productive Families
   {
     id: 'p4',
-    nameAr: 'سمبوسة لحم (مفرزنة)',
+    nameAr: 'سمبوسة لحم (مفرزنة)', 
     descriptionAr: 'علبة ٥٠ حبة، عجينة منزلية وحشوة لحم غنم',
     price: 85,
     image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&q=80&w=800',
@@ -181,13 +181,22 @@ const INITIAL_PRODUCTS: Product[] = [
 
 export const App: React.FC = () => {
   // State for Navigation and Data
-  const [activeView, setActiveView] = useState<'home' | 'product' | 'cart' | 'auth' | 'profile' | 'admin' | 'seller'>('home');
+  const [activeView, setActiveView] = useState<'home' | 'product' | 'cart' | 'auth' | 'profile' | 'admin' | 'seller' | 'favorites'>('home');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedSeller, setSelectedSeller] = useState<Seller | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+
+  // Financial State (Admin)
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [commissionRate, setCommissionRate] = useState<number>(15); // 15% default
+  const [deliveryFee, setDeliveryFee] = useState<number>(15); // 15 SAR default
+
+  // Favorites State
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [favoriteSellers, setFavoriteSellers] = useState<Set<string>>(new Set());
 
   // Filtering State
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
@@ -208,6 +217,27 @@ export const App: React.FC = () => {
     }
   };
 
+  const toggleFavorite = (productId: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    triggerHaptic();
+    setFavorites(prev => {
+        const next = new Set(prev);
+        if (next.has(productId)) next.delete(productId);
+        else next.add(productId);
+        return next;
+    });
+  };
+
+  const toggleFavoriteSeller = (sellerId: string) => {
+    triggerHaptic();
+    setFavoriteSellers(prev => {
+        const next = new Set(prev);
+        if (next.has(sellerId)) next.delete(sellerId);
+        else next.add(sellerId);
+        return next;
+    });
+  };
+
   const addToCart = (product: Product, quantity: number = 1) => {
     setCart(prev => {
       const existing = prev.find(item => item.product.id === product.id);
@@ -220,7 +250,6 @@ export const App: React.FC = () => {
       }
       return [...prev, { product, quantity }];
     });
-    // Optional: Show toast
     triggerHaptic(20);
   };
 
@@ -234,10 +263,12 @@ export const App: React.FC = () => {
       return;
     }
     
+    const orderTotal = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0) + deliveryFee;
+
     const newOrder: Order = {
       id: Math.random().toString(36).substr(2, 9),
       items: cart,
-      total: cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0) + 15, // +15 delivery
+      total: orderTotal,
       status: 'pending',
       date: new Date().toISOString(),
       customerId: user.id
@@ -250,12 +281,9 @@ export const App: React.FC = () => {
 
   const handleLogin = (userData: User) => {
     setUser(userData);
-    
-    // Check if user exists in our "DB", if not add them
     if (!users.find(u => u.id === userData.id) && userData.id !== 'admin-master') {
         setUsers([...users, userData]);
     }
-
     if (userData.role === 'admin') {
         setActiveView('admin');
     } else {
@@ -275,6 +303,20 @@ export const App: React.FC = () => {
     setActiveView('seller');
   };
 
+  // Safe Navigation with Auth Check
+  const navigateToProfile = () => {
+      triggerHaptic();
+      if (user) {
+          setActiveView('profile');
+      } else {
+          setActiveView('auth');
+      }
+  };
+
+  const handleUpdateOrderStatus = (orderId: string, status: Order['status']) => {
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
+  };
+
   // Filter Logic
   const displayedProducts = products.filter(p => {
     const matchesCategory = selectedCategoryId ? p.categoryId === selectedCategoryId : true;
@@ -288,8 +330,6 @@ export const App: React.FC = () => {
   return (
     <>
       <div className="min-h-screen bg-slate-50 shadow-sm overflow-x-hidden relative font-sans text-slate-900">
-        
-        {/* Render View based on activeView State */}
         
         {activeView === 'auth' && (
           <div className="max-w-md mx-auto min-h-screen bg-white shadow-2xl md:my-8 md:min-h-0 md:rounded-3xl md:overflow-hidden">
@@ -307,9 +347,14 @@ export const App: React.FC = () => {
                 sellers={sellers} setSellers={setSellers}
                 products={products} setProducts={setProducts}
                 orders={orders}
+                transactions={transactions}
+                onAddTransaction={(t) => setTransactions([t, ...transactions])}
+                commissionRate={commissionRate} setCommissionRate={setCommissionRate}
+                deliveryFee={deliveryFee} setDeliveryFee={setDeliveryFee}
                 adminUser={user}
                 onLogout={() => { setUser(null); setActiveView('auth'); }}
                 onUpdateAdminPassword={(pass) => console.log('Update pass', pass)}
+                onUpdateOrderStatus={handleUpdateOrderStatus}
             />
         )}
 
@@ -332,9 +377,7 @@ export const App: React.FC = () => {
                user={user} 
                orders={orders} 
                onLogout={() => { setUser(null); setActiveView('home'); }} 
-               onStatusUpdate={(orderId, status) => {
-                   setOrders(orders.map(o => o.id === orderId ? { ...o, status } : o));
-               }}
+               onStatusUpdate={handleUpdateOrderStatus}
              />
           </div>
         )}
@@ -346,6 +389,8 @@ export const App: React.FC = () => {
                 onBack={() => setActiveView('home')}
                 onProductClick={navigateToProduct}
                 onAddToCart={(p) => addToCart(p, 1)}
+                isFavorite={favoriteSellers.has(selectedSeller.id)}
+                onToggleFavorite={() => toggleFavoriteSeller(selectedSeller.id)}
             />
         )}
 
@@ -355,7 +400,61 @@ export const App: React.FC = () => {
               seller={sellers.find(s => s.id === selectedProduct.sellerId)}
               onBack={() => setActiveView('home')}
               onAddToCart={addToCart}
+              isFavorite={favorites.has(selectedProduct.id)}
+              onToggleFavorite={() => toggleFavorite(selectedProduct.id)}
             />
+        )}
+
+        {/* Favorites View */}
+        {activeView === 'favorites' && (
+            <div className="min-h-screen bg-slate-50 pb-24">
+                <header className="bg-white p-4 shadow-sm sticky top-0 z-10 flex items-center gap-4">
+                    <button onClick={() => setActiveView('home')} className="p-2 bg-slate-100 rounded-full">
+                        <ArrowRight className="w-5 h-5 text-slate-600" />
+                    </button>
+                    <h1 className="text-xl font-bold text-slate-800">المفضلة</h1>
+                </header>
+                <div className="p-4 max-w-7xl mx-auto">
+                    {favorites.size === 0 ? (
+                        <div className="text-center py-20">
+                            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Heart className="w-8 h-8 text-red-200" />
+                            </div>
+                            <h2 className="text-lg font-bold text-slate-700">لا توجد منتجات مفضلة</h2>
+                            <p className="text-slate-500 mt-1">اضغط على رمز القلب لإضافة منتجات هنا</p>
+                            <button onClick={() => setActiveView('home')} className="mt-4 text-amber-600 font-bold hover:underline">تصفح المنتجات</button>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {products.filter(p => favorites.has(p.id)).map(product => {
+                                const seller = sellers.find(s => s.id === product.sellerId);
+                                return (
+                                    <div 
+                                        key={product.id} 
+                                        onClick={() => navigateToProduct(product)}
+                                        className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 cursor-pointer active:scale-95 transition-all"
+                                    >
+                                        <div className="relative mb-3">
+                                            <img src={product.image} alt={product.nameAr} className="w-full h-32 md:h-48 rounded-xl object-cover bg-slate-200" />
+                                            <button 
+                                                onClick={(e) => toggleFavorite(product.id, e)}
+                                                className="absolute top-2 left-2 p-1.5 bg-white/80 backdrop-blur rounded-full text-red-500 hover:bg-white"
+                                            >
+                                                <Heart className="w-4 h-4 fill-red-500" />
+                                            </button>
+                                        </div>
+                                        <h3 className="font-bold text-slate-800 text-sm mb-1 truncate">{product.nameAr}</h3>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-amber-600 font-bold text-sm">{product.price} ر.س</span>
+                                            {seller && <span className="text-[10px] text-slate-500">{seller.nameAr}</span>}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+            </div>
         )}
 
         {activeView === 'home' && (
@@ -377,15 +476,15 @@ export const App: React.FC = () => {
                     </div>
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex gap-6 text-sm font-medium text-slate-600">
-                        <button onClick={() => { setActiveView('home'); triggerHaptic(); }} className="hover:text-amber-600 transition-colors">الرئيسية</button>
-                        <button onClick={() => { setActiveView('profile'); triggerHaptic(); }} className="hover:text-amber-600 transition-colors">طلباتي</button>
-                        <button className="hover:text-amber-600 transition-colors">المفضلة</button>
+                        <button onClick={() => { setActiveView('home'); triggerHaptic(); }} className={`transition-colors ${activeView === 'home' ? 'text-amber-600 font-bold' : 'hover:text-amber-600'}`}>الرئيسية</button>
+                        <button onClick={navigateToProfile} className="hover:text-amber-600 transition-colors">طلباتي</button>
+                        <button onClick={() => { setActiveView('favorites'); triggerHaptic(); }} className="hover:text-amber-600 transition-colors">المفضلة</button>
                     </nav>
                   </div>
 
                   <div className="flex gap-2">
                       {user ? (
-                          <button onClick={() => setActiveView('profile')} className="p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors">
+                          <button onClick={navigateToProfile} className="p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors">
                               <UserIcon className="w-5 h-5 text-slate-600" />
                           </button>
                       ) : (
@@ -561,6 +660,7 @@ export const App: React.FC = () => {
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                       {displayedProducts.map(product => {
                         const seller = sellers.find(s => s.id === product.sellerId);
+                        const isFav = favorites.has(product.id);
                         return (
                           <div 
                             key={product.id} 
@@ -569,8 +669,11 @@ export const App: React.FC = () => {
                           >
                             <div className="relative mb-3">
                               <img src={product.image} alt={product.nameAr} className="w-full h-32 md:h-48 rounded-xl object-cover bg-slate-200" loading="lazy" />
-                              <button className="absolute top-2 left-2 p-1.5 bg-white/80 backdrop-blur rounded-full text-slate-400 hover:text-red-500 transition-colors">
-                                <Heart className="w-4 h-4" />
+                              <button 
+                                onClick={(e) => toggleFavorite(product.id, e)}
+                                className={`absolute top-2 left-2 p-1.5 backdrop-blur rounded-full transition-colors ${isFav ? 'bg-red-50 text-red-500' : 'bg-white/80 text-slate-400 hover:text-red-500'}`}
+                              >
+                                <Heart className={`w-4 h-4 ${isFav ? 'fill-red-500' : ''}`} />
                               </button>
                               {seller && (
                                   <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur px-2 py-0.5 rounded text-[10px] text-white flex items-center gap-1">
@@ -597,53 +700,51 @@ export const App: React.FC = () => {
         )}
 
         {/* Bottom Navigation (Mobile Only) */}
-        {activeView === 'home' && (
-            <>
-                <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-between items-center z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-                  <button onClick={() => { setActiveView('home'); triggerHaptic(); }} className="flex flex-col items-center gap-1 text-amber-600">
-                      <Home className="w-6 h-6 fill-amber-100" />
-                      <span className="text-[10px] font-bold">الرئيسية</span>
-                  </button>
-                  <button onClick={() => triggerHaptic()} className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600">
-                      <Heart className="w-6 h-6" />
-                      <span className="text-[10px] font-medium">المفضلة</span>
-                  </button>
-                  
-                  {/* Voice Assistant FAB */}
-                  <div className="relative -top-6">
-                      <button 
-                      onClick={() => { setIsVoiceModalOpen(true); triggerHaptic(20); }}
-                      className="w-14 h-14 bg-gradient-to-tr from-amber-500 to-amber-400 rounded-full flex items-center justify-center text-white shadow-lg shadow-amber-500/30 hover:scale-105 active:scale-95 transition-transform"
-                      >
-                      <Mic className="w-7 h-7" />
-                      </button>
-                  </div>
+        {activeView === 'home' || activeView === 'favorites' || activeView === 'profile' ? (
+             <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-between items-center z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+             <button onClick={() => { setActiveView('home'); triggerHaptic(); }} className={`flex flex-col items-center gap-1 ${activeView === 'home' ? 'text-amber-600' : 'text-slate-400'}`}>
+                 <Home className={`w-6 h-6 ${activeView === 'home' ? 'fill-amber-100' : ''}`} />
+                 <span className="text-[10px] font-bold">الرئيسية</span>
+             </button>
+             <button onClick={() => { setActiveView('favorites'); triggerHaptic(); }} className={`flex flex-col items-center gap-1 ${activeView === 'favorites' ? 'text-amber-600' : 'text-slate-400 hover:text-slate-600'}`}>
+                 <Heart className={`w-6 h-6 ${activeView === 'favorites' ? 'fill-amber-100' : ''}`} />
+                 <span className="text-[10px] font-medium">المفضلة</span>
+             </button>
+             
+             {/* Voice Assistant FAB */}
+             <div className="relative -top-6">
+                 <button 
+                 onClick={() => { setIsVoiceModalOpen(true); triggerHaptic(20); }}
+                 className="w-14 h-14 bg-gradient-to-tr from-amber-500 to-amber-400 rounded-full flex items-center justify-center text-white shadow-lg shadow-amber-500/30 hover:scale-105 active:scale-95 transition-transform"
+                 >
+                 <Mic className="w-7 h-7" />
+                 </button>
+             </div>
 
-                  <button onClick={() => triggerHaptic()} className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600">
-                      <Clock className="w-6 h-6" />
-                      <span className="text-[10px] font-medium">طلباتي</span>
-                  </button>
-                  <button onClick={() => { setActiveView('profile'); triggerHaptic(); }} className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600">
-                      <UserIcon className="w-6 h-6" />
-                      <span className="text-[10px] font-medium">حسابي</span>
-                  </button>
-                </nav>
+             <button onClick={navigateToProfile} className={`flex flex-col items-center gap-1 ${activeView === 'profile' ? 'text-amber-600' : 'text-slate-400 hover:text-slate-600'}`}>
+                 <Clock className={`w-6 h-6 ${activeView === 'profile' ? 'fill-amber-100' : ''}`} />
+                 <span className="text-[10px] font-medium">طلباتي</span>
+             </button>
+             <button onClick={navigateToProfile} className={`flex flex-col items-center gap-1 ${activeView === 'profile' ? 'text-amber-600' : 'text-slate-400 hover:text-slate-600'}`}>
+                 <UserIcon className={`w-6 h-6 ${activeView === 'profile' ? 'fill-amber-100' : ''}`} />
+                 <span className="text-[10px] font-medium">حسابي</span>
+             </button>
+           </nav>
+        ) : null}
 
-                {/* Desktop Floating Mic Button */}
-                <button 
-                   onClick={() => { setIsVoiceModalOpen(true); triggerHaptic(20); }}
-                   className="hidden md:flex fixed bottom-8 left-8 z-40 bg-gradient-to-tr from-amber-500 to-amber-400 text-white p-4 rounded-full shadow-lg shadow-amber-500/30 hover:scale-110 active:scale-95 transition-all items-center gap-2"
-                >
-                    <Mic className="w-6 h-6" />
-                    <span className="font-bold text-sm">مساعد سفرة</span>
-                </button>
+        {/* Desktop Floating Mic Button */}
+        <button 
+            onClick={() => { setIsVoiceModalOpen(true); triggerHaptic(20); }}
+            className="hidden md:flex fixed bottom-8 left-8 z-40 bg-gradient-to-tr from-amber-500 to-amber-400 text-white p-4 rounded-full shadow-lg shadow-amber-500/30 hover:scale-110 active:scale-95 transition-all items-center gap-2"
+        >
+            <Mic className="w-6 h-6" />
+            <span className="font-bold text-sm">مساعد سفرة</span>
+        </button>
 
-                <VoiceAssistantModal 
-                isOpen={isVoiceModalOpen} 
-                onClose={() => setIsVoiceModalOpen(false)} 
-                />
-            </>
-        )}
+        <VoiceAssistantModal 
+        isOpen={isVoiceModalOpen} 
+        onClose={() => setIsVoiceModalOpen(false)} 
+        />
       </div>
     </>
   );

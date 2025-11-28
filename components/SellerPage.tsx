@@ -9,6 +9,8 @@ interface SellerPageProps {
   onBack: () => void;
   onProductClick: (product: Product) => void;
   onAddToCart: (product: Product) => void;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
 }
 
 export const SellerPage: React.FC<SellerPageProps> = ({ 
@@ -16,7 +18,9 @@ export const SellerPage: React.FC<SellerPageProps> = ({
   products, 
   onBack, 
   onProductClick,
-  onAddToCart 
+  onAddToCart,
+  isFavorite = false,
+  onToggleFavorite
 }) => {
   return (
     <div className="min-h-screen bg-slate-50 pb-24 md:pb-8 animate-in slide-in-from-left-4 duration-300">
@@ -37,8 +41,11 @@ export const SellerPage: React.FC<SellerPageProps> = ({
           >
             <ArrowRight className="w-6 h-6" />
           </button>
-          <button className="p-2.5 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/30 transition-colors">
-            <Heart className="w-5 h-5" />
+          <button 
+            onClick={onToggleFavorite}
+            className={`p-2.5 backdrop-blur-md rounded-full transition-colors ${isFavorite ? 'bg-red-500 text-white' : 'bg-white/20 text-white hover:bg-white/30'}`}
+          >
+            <Heart className={`w-5 h-5 ${isFavorite ? 'fill-white' : ''}`} />
           </button>
         </div>
 

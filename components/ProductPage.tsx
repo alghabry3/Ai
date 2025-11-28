@@ -8,9 +8,18 @@ interface ProductPageProps {
   seller?: Seller;
   onBack: () => void;
   onAddToCart: (product: Product, quantity: number) => void;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
 }
 
-export const ProductPage: React.FC<ProductPageProps> = ({ product, seller, onBack, onAddToCart }) => {
+export const ProductPage: React.FC<ProductPageProps> = ({ 
+    product, 
+    seller, 
+    onBack, 
+    onAddToCart,
+    isFavorite = false,
+    onToggleFavorite
+}) => {
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -124,8 +133,11 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, seller, onBac
                         <ArrowRight className="w-6 h-6" />
                     </button>
                     <div className="flex gap-2">
-                        <button className="p-2 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/30 transition-colors">
-                            <Heart className="w-5 h-5" />
+                        <button 
+                            onClick={onToggleFavorite}
+                            className={`p-2 backdrop-blur-md rounded-full transition-colors ${isFavorite ? 'bg-red-500 text-white' : 'bg-white/20 text-white hover:bg-white/30'}`}
+                        >
+                            <Heart className={`w-5 h-5 ${isFavorite ? 'fill-white' : ''}`} />
                         </button>
                     </div>
                 </div>
@@ -151,7 +163,16 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, seller, onBac
                     {/* Header */}
                     <div className="flex justify-between items-start mb-2">
                         <h1 className="text-2xl md:text-3xl font-bold text-slate-800 leading-tight flex-1 ml-4">{product.nameAr}</h1>
-                        <div className="text-xl md:text-2xl font-bold text-amber-600 whitespace-nowrap">{product.price} ر.س</div>
+                        <div className="flex items-center gap-2">
+                            {/* Desktop Favorite Button */}
+                            <button 
+                                onClick={onToggleFavorite}
+                                className={`hidden md:flex p-2 rounded-full transition-colors ${isFavorite ? 'bg-red-50 text-red-500' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'}`}
+                            >
+                                <Heart className={`w-6 h-6 ${isFavorite ? 'fill-red-500' : ''}`} />
+                            </button>
+                            <div className="text-xl md:text-2xl font-bold text-amber-600 whitespace-nowrap">{product.price} ر.س</div>
+                        </div>
                     </div>
                     
                     <div className="flex items-center gap-6 text-sm text-slate-500 mb-6">

@@ -63,6 +63,19 @@ export interface Order {
     driverId?: string; // Assigned driver
 }
 
+// Financial Types
+export type TransactionType = 'payout_seller' | 'payout_driver' | 'commission_collected' | 'refund';
+
+export interface Transaction {
+    id: string;
+    amount: number;
+    type: TransactionType;
+    date: string;
+    referenceId: string; // SellerID or DriverID
+    description: string;
+    status: 'completed' | 'pending';
+}
+
 // Live API Types
 export type LiveStatus = 'disconnected' | 'connecting' | 'connected' | 'error';
 
