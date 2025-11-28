@@ -15,6 +15,7 @@ export interface Product {
         carbs: string;
         fats: string;
     };
+    images?: string[];
 }
 
 export interface Category {

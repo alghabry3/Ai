@@ -35,7 +35,12 @@ const POPULAR_PRODUCTS: Product[] = [
     nameAr: 'وجبة دجاج عائلي', 
     descriptionAr: '١٢ قطعة دجاج + بطاطس + كولا', 
     price: 85, 
-    image: 'https://picsum.photos/seed/chicken/200/200', 
+    image: 'https://picsum.photos/seed/chicken/600/600', 
+    images: [
+      'https://picsum.photos/seed/chicken/600/600',
+      'https://picsum.photos/seed/chicken2/600/600',
+      'https://picsum.photos/seed/chicken3/600/600'
+    ],
     rating: 4.7,
     longDescriptionAr: 'استمتع بوجبة عائلية متكاملة تكفي الجميع! ١٢ قطعة من الدجاج المقرمش المتبل بخلطتنا السرية، يقدم مع بطاطس ذهبية مقلية ومشروب كولا عائلي بارد. الخيار الأمثل للتجمعات.',
     ingredientsAr: ['دجاج طازج', 'دقيق القمح', 'توابل خاصة', 'زيت نباتي', 'بطاطس', 'ملح'],
@@ -46,7 +51,11 @@ const POPULAR_PRODUCTS: Product[] = [
     nameAr: 'بيتزا سوبر سوبريم', 
     descriptionAr: 'حجم كبير مع أطراف جبنة', 
     price: 65, 
-    image: 'https://picsum.photos/seed/pizza2/200/200', 
+    image: 'https://picsum.photos/seed/pizza2/600/600', 
+    images: [
+      'https://picsum.photos/seed/pizza2/600/600',
+      'https://picsum.photos/seed/pizza3/600/600'
+    ],
     rating: 4.5,
     longDescriptionAr: 'بيتزا سوبر سوبريم الغنية بالمكونات! طبقة غنية من صلصة الطماطم وجبنة الموزاريلا، مغطاة بقطع البيبروني، اللحم المفروم، الفطر، الفلفل الأخضر، والزيتون الأسود. تأتيكم بأطراف محشوة بالجبنة اللذيذة.',
     ingredientsAr: ['عجينة البيتزا', 'صلصة طماطم', 'جبنة موزاريلا', 'بيبروني', 'لحم بقري', 'فطر', 'فلفل أخضر', 'زيتون'],

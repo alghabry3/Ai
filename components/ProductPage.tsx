@@ -9,16 +9,45 @@ interface ProductPageProps {
 
 export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack }) => {
   const [quantity, setQuantity] = useState(1);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   const increment = () => setQuantity(q => q + 1);
   const decrement = () => setQuantity(q => Math.max(1, q - 1));
 
+  // Determine images to display
+  const images = product.images && product.images.length > 0 
+    ? product.images 
+    : [product.image];
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const width = e.currentTarget.offsetWidth;
+    const scrollLeft = e.currentTarget.scrollLeft;
+    const index = Math.round(Math.abs(scrollLeft) / width);
+    setActiveImageIndex(index);
+  };
+
   return (
     <div className="min-h-screen bg-white pb-24 animate-in slide-in-from-left-4 duration-300">
-      {/* Header Image & Nav */}
+      {/* Header Image Carousel & Nav */}
       <div className="relative h-72 bg-slate-200">
-        <img src={product.image} alt={product.nameAr} className="w-full h-full object-cover" />
-        <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-start bg-gradient-to-b from-black/50 to-transparent">
+        <div 
+           className="w-full h-full flex overflow-x-auto snap-x snap-mandatory scrollbar-hide [&::-webkit-scrollbar]:hidden" 
+           dir="ltr" // Force LTR for consistent horizontal scrolling physics
+           onScroll={handleScroll}
+           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {images.map((img, index) => (
+             <div key={index} className="flex-shrink-0 w-full h-full snap-center relative">
+               <img src={img} alt={`${product.nameAr} ${index + 1}`} className="w-full h-full object-cover" />
+             </div>
+          ))}
+        </div>
+
+        {/* Overlay Gradients */}
+        <div className="absolute top-0 left-0 right-0 p-4 h-24 bg-gradient-to-b from-black/50 to-transparent pointer-events-none" />
+
+        {/* Navigation Buttons */}
+        <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-start z-10">
           <button onClick={onBack} className="p-2 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/30 transition-colors">
             <ArrowRight className="w-6 h-6" />
           </button>
@@ -31,6 +60,18 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack }) => 
             </button>
           </div>
         </div>
+
+        {/* Dots Indicator */}
+        {images.length > 1 && (
+          <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
+            {images.map((_, i) => (
+              <div 
+                key={i} 
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${i === activeImageIndex ? 'bg-white w-4' : 'bg-white/50'}`} 
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="px-5 -mt-6 relative z-10">
