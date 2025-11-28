@@ -5,9 +5,10 @@ import { Product } from '../types';
 interface ProductPageProps {
   product: Product;
   onBack: () => void;
+  onAddToCart: (product: Product, quantity: number) => void;
 }
 
-export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack }) => {
+export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack, onAddToCart }) => {
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
@@ -106,13 +107,11 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack }) => 
         {product.ingredientsAr && product.ingredientsAr.length > 0 && (
           <div className="p-6 border-b border-slate-100">
             <h2 className="text-lg font-bold text-slate-800 mb-3">المكونات</h2>
-            <div className="flex flex-wrap gap-2">
+            <ul className="list-disc list-inside space-y-2 text-slate-600 text-sm marker:text-amber-500">
               {product.ingredientsAr.map((ing, i) => (
-                <span key={i} className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-sm">
-                  {ing}
-                </span>
+                <li key={i}>{ing}</li>
               ))}
-            </div>
+            </ul>
           </div>
         )}
 
@@ -163,7 +162,10 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack }) => 
                <Plus className="w-4 h-4" />
              </button>
            </div>
-           <button className="flex-1 bg-slate-900 text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200">
+           <button 
+             onClick={() => onAddToCart(product, quantity)}
+             className="flex-1 bg-slate-900 text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200"
+           >
              إضافة للسلة - {product.price * quantity} ر.س
            </button>
         </div>

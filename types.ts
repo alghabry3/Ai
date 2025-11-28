@@ -1,4 +1,15 @@
 // Domain Types
+export type UserRole = 'customer' | 'seller' | 'driver';
+
+export interface User {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    role: UserRole;
+    password?: string; // In a real app, never store plain text
+}
+
 export interface Product {
     id: string;
     nameAr: string;
@@ -31,6 +42,23 @@ export interface Seller {
     deliveryTime: string;
     rating: number;
     image: string;
+}
+
+export interface CartItem {
+    product: Product;
+    quantity: number;
+}
+
+export type OrderStatus = 'pending' | 'accepted' | 'delivering' | 'delivered';
+
+export interface Order {
+    id: string;
+    items: CartItem[];
+    total: number;
+    status: OrderStatus;
+    date: string;
+    customerId: string;
+    driverId?: string; // Assigned driver
 }
 
 // Live API Types

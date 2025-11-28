@@ -1,20 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { VoiceAssistantModal } from './components/VoiceAssistantModal';
 import { ProductPage } from './components/ProductPage';
+import { Auth } from './components/Auth';
+import { Cart } from './components/Cart';
+import { Profile } from './components/Profile';
 import { 
   ShoppingBag, 
   Search, 
   MapPin, 
   Star, 
   Clock, 
-  User, 
+  User as UserIcon, 
   Home, 
   Heart, 
   Mic
 } from 'lucide-react';
-import { Product, Category, Seller } from './types';
+import { Product, Category, Seller, User, CartItem, Order, UserRole } from './types';
 
-// Mock Data
+// --- MOCK DATA ---
 const CATEGORIES: Category[] = [
   { id: '1', nameAr: 'برجر', icon: '🍔' },
   { id: '2', nameAr: 'بيتزا', icon: '🍕' },
@@ -63,28 +66,179 @@ const POPULAR_PRODUCTS: Product[] = [
   },
 ];
 
+// View Router Enum
+type AppView = 'home' | 'product' | 'cart' | 'profile' | 'auth';
+
 const App: React.FC = () => {
+  // --- STATE MANAGEMENT ---
+  const [currentView, setCurrentView] = useState<AppView>('home');
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  
+  // Data Store
+  const [users, setUsers] = useState<User[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
 
+  // Init Demo Data
+  useEffect(() => {
+    // Add a demo driver and seller if empty
+    if (users.length === 0) {
+      setUsers([
+        { id: 'd1', name: 'سائق تجريبي', email: 'driver@demo.com', phone: '0500000000', role: 'driver' },
+        { id: 's1', name: 'مدير المطعم', email: 'seller@demo.com', phone: '0500000000', role: 'seller' }
+      ]);
+    }
+  }, []);
+
+  // --- ACTIONS ---
+
+  const handleRegister = (user: User) => {
+    setUsers([...users, user]);
+    setCurrentUser(user);
+    setCurrentView('home');
+  };
+
+  const handleLogin = (user: User) => {
+    // In a real app, verify credentials. Here we just simulate login or find existing.
+    const existing = users.find(u => u.email === user.email);
+    if (existing) {
+      setCurrentUser(existing);
+    } else {
+      // Auto-register for demo simplicity
+      setUsers([...users, user]);
+      setCurrentUser(user);
+    }
+    setCurrentView('home');
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setCurrentView('auth');
+  };
+
+  const addToCart = (product: Product, quantity: number) => {
+    setCart(prev => {
+      const existing = prev.find(p => p.product.id === product.id);
+      if (existing) {
+        return prev.map(p => p.product.id === product.id ? { ...p, quantity: p.quantity + quantity } : p);
+      }
+      return [...prev, { product, quantity }];
+    });
+    setSelectedProduct(null);
+    // Don't change view immediately, maybe show toast? For now go home
+    setCurrentView('home');
+  };
+
+  const removeFromCart = (id: string) => {
+    setCart(prev => prev.filter(item => item.product.id !== id));
+  };
+
+  const placeOrder = () => {
+    if (!currentUser) {
+      setCurrentView('auth');
+      return;
+    }
+    
+    const newOrder: Order = {
+      id: Math.random().toString(36).substr(2, 6),
+      items: [...cart],
+      total: cart.reduce((sum, i) => sum + (i.product.price * i.quantity), 0) + 15, // + delivery
+      status: 'pending',
+      date: new Date().toISOString(),
+      customerId: currentUser.id
+    };
+
+    setOrders([newOrder, ...orders]);
+    setCart([]); // Clear cart
+    setCurrentView('profile'); // Go to orders to track
+  };
+
+  const updateOrderStatus = (orderId: string, newStatus: Order['status']) => {
+    setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+  };
+
+  // --- NAVIGATION HELPERS ---
+
+  const navigateToProduct = (product: Product) => {
+    setSelectedProduct(product);
+    // Note: In our simple router, product view is overlay or handled via selectedProduct state
+    // But let's verify if we need to change currentView.
+    // The current conditional rendering checks `selectedProduct` first.
+    // So setting selectedProduct is enough.
+  };
+
+  // --- RENDERERS ---
+
+  // 1. Check Voice Assistant (Global)
+  // 2. Check Auth View
+  if (currentView === 'auth') {
+    return (
+      <Auth 
+        onLogin={handleLogin} 
+        onRegister={handleRegister} 
+        onBack={() => setCurrentView('home')} 
+      />
+    );
+  }
+
+  // 3. Check Cart View
+  if (currentView === 'cart') {
+    return (
+      <Cart 
+        items={cart} 
+        onRemove={removeFromCart} 
+        onCheckout={placeOrder} 
+        onBack={() => setCurrentView('home')} 
+        user={currentUser}
+        onLoginReq={() => setCurrentView('auth')}
+      />
+    );
+  }
+
+  // 4. Check Profile View
+  if (currentView === 'profile') {
+    if (!currentUser) {
+      // Redirect to auth if trying to access profile while logged out
+      setTimeout(() => setCurrentView('auth'), 0);
+      return null; 
+    }
+    return (
+      <div className="relative">
+         <Profile 
+            user={currentUser} 
+            orders={orders} 
+            onLogout={handleLogout}
+            onStatusUpdate={updateOrderStatus}
+         />
+         {/* Bottom Nav visible in Profile */}
+         <BottomNav current={currentView} setView={setCurrentView} cartCount={cart.length} />
+      </div>
+    );
+  }
+
+  // 5. Check Product View (Overlay logic)
+  if (selectedProduct) {
+    return (
+      <ProductPage 
+        product={selectedProduct} 
+        onBack={() => setSelectedProduct(null)} 
+        onAddToCart={addToCart}
+      />
+    );
+  }
+
+  // 6. Default: Home View
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
       
-      {/* Voice Assistant Modal - Always available */}
       <VoiceAssistantModal 
         isOpen={isVoiceModalOpen} 
         onClose={() => setIsVoiceModalOpen(false)} 
       />
 
-      {selectedProduct ? (
-        // Product Page View
-        <ProductPage 
-          product={selectedProduct} 
-          onBack={() => setSelectedProduct(null)} 
-        />
-      ) : (
-        // Home Screen View
-        <div className="pb-20">
+      <div className="pb-24">
           {/* Top Header */}
           <header className="bg-white sticky top-0 z-30 shadow-sm px-4 py-3">
             <div className="flex justify-between items-center mb-4">
@@ -93,16 +247,23 @@ const App: React.FC = () => {
                    س
                  </div>
                  <div>
-                   <p className="text-xs text-slate-500 font-medium">التوصيل إلى</p>
+                   <p className="text-xs text-slate-500 font-medium">مرحباً، {currentUser ? currentUser.name.split(' ')[0] : 'ضيف'}</p>
                    <div className="flex items-center gap-1 text-slate-800 font-bold text-sm cursor-pointer">
-                     <span>المنزل، الرياض</span>
+                     <span>الرياض، السعودية</span>
                      <MapPin className="w-3 h-3 text-amber-500" />
                    </div>
                  </div>
               </div>
-              <button className="p-2 bg-slate-100 rounded-full text-slate-600 hover:bg-slate-200 transition-colors relative">
+              <button 
+                onClick={() => setCurrentView('cart')}
+                className="p-2 bg-slate-100 rounded-full text-slate-600 hover:bg-slate-200 transition-colors relative"
+              >
                  <ShoppingBag className="w-6 h-6" />
-                 <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+                 {cart.length > 0 && (
+                   <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-white text-[9px] text-white flex items-center justify-center">
+                     {cart.length}
+                   </span>
+                 )}
               </button>
             </div>
 
@@ -119,6 +280,20 @@ const App: React.FC = () => {
 
           <main className="px-4 pt-6 space-y-8">
             
+            {/* Seller/Driver Dashboard Access Hint */}
+            {currentUser && currentUser.role !== 'customer' && (
+               <div 
+                 onClick={() => setCurrentView('profile')}
+                 className="bg-slate-900 text-white p-4 rounded-2xl shadow-lg cursor-pointer flex justify-between items-center"
+               >
+                  <div>
+                    <h3 className="font-bold">لوحة التحكم</h3>
+                    <p className="text-xs text-slate-400">تابع الطلبات والمهام الخاصة بك</p>
+                  </div>
+                  <UserIcon className="w-6 h-6" />
+               </div>
+            )}
+
             {/* Categories */}
             <section>
               <h2 className="text-lg font-bold text-slate-800 mb-4">التصنيفات</h2>
@@ -172,7 +347,7 @@ const App: React.FC = () => {
                 {POPULAR_PRODUCTS.map(product => (
                   <div 
                     key={product.id} 
-                    onClick={() => setSelectedProduct(product)}
+                    onClick={() => navigateToProduct(product)}
                     className="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 cursor-pointer active:scale-95 transition-transform"
                   >
                     <div className="relative mb-3">
@@ -193,41 +368,57 @@ const App: React.FC = () => {
                 ))}
               </div>
             </section>
-          </main>
+      </div>
 
-          {/* Floating Action Button - Voice Assistant */}
-          <button 
-            onClick={() => setIsVoiceModalOpen(true)}
-            className="fixed bottom-24 left-4 z-40 bg-gradient-to-tr from-amber-500 to-amber-400 text-white w-14 h-14 rounded-full shadow-xl shadow-amber-200 flex items-center justify-center hover:scale-110 transition-transform duration-200 group"
-          >
-            <div className="absolute inset-0 bg-white opacity-20 rounded-full animate-ping group-hover:animate-none"></div>
-            <Mic className="w-6 h-6 relative z-10" />
-          </button>
+      {/* Floating Action Button - Voice Assistant */}
+      <button 
+        onClick={() => setIsVoiceModalOpen(true)}
+        className="fixed bottom-24 left-4 z-40 bg-gradient-to-tr from-amber-500 to-amber-400 text-white w-14 h-14 rounded-full shadow-xl shadow-amber-200 flex items-center justify-center hover:scale-110 transition-transform duration-200 group"
+      >
+        <div className="absolute inset-0 bg-white opacity-20 rounded-full animate-ping group-hover:animate-none"></div>
+        <Mic className="w-6 h-6 relative z-10" />
+      </button>
 
-          {/* Bottom Navigation */}
-          <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-between items-center z-30">
-            <button className="flex flex-col items-center gap-1 text-amber-500">
-              <Home className="w-6 h-6" />
-              <span className="text-[10px] font-medium">الرئيسية</span>
-            </button>
-            <button className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 transition-colors">
-              <Search className="w-6 h-6" />
-              <span className="text-[10px] font-medium">البحث</span>
-            </button>
-            <button className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 transition-colors">
-              <ShoppingBag className="w-6 h-6" />
-              <span className="text-[10px] font-medium">طلباتي</span>
-            </button>
-            <button className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 transition-colors">
-              <User className="w-6 h-6" />
-              <span className="text-[10px] font-medium">حسابي</span>
-            </button>
-          </nav>
-        </div>
-      )}
-
+      {/* Bottom Navigation */}
+      <BottomNav current={currentView} setView={setCurrentView} cartCount={cart.length} />
     </div>
   );
 };
+
+// Extracted for re-use in Profile
+const BottomNav: React.FC<{current: string, setView: (v: AppView) => void, cartCount: number}> = ({ current, setView, cartCount }) => (
+  <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-between items-center z-30">
+    <button 
+      onClick={() => setView('home')}
+      className={`flex flex-col items-center gap-1 ${current === 'home' ? 'text-amber-500' : 'text-slate-400'}`}
+    >
+      <Home className="w-6 h-6" />
+      <span className="text-[10px] font-medium">الرئيسية</span>
+    </button>
+    <button 
+      className={`flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600`}
+    >
+      <Search className="w-6 h-6" />
+      <span className="text-[10px] font-medium">البحث</span>
+    </button>
+    <button 
+      onClick={() => setView('cart')}
+      className={`flex flex-col items-center gap-1 ${current === 'cart' ? 'text-amber-500' : 'text-slate-400'} relative`}
+    >
+      <div className="relative">
+         <ShoppingBag className="w-6 h-6" />
+         {cartCount > 0 && <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>}
+      </div>
+      <span className="text-[10px] font-medium">طلباتي</span>
+    </button>
+    <button 
+      onClick={() => setView(current === 'auth' ? 'auth' : 'profile')}
+      className={`flex flex-col items-center gap-1 ${current === 'profile' ? 'text-amber-500' : 'text-slate-400'}`}
+    >
+      <UserIcon className="w-6 h-6" />
+      <span className="text-[10px] font-medium">حسابي</span>
+    </button>
+  </nav>
+);
 
 export default App;
