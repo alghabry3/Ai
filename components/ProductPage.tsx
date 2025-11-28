@@ -1,22 +1,37 @@
-import React, { useState } from 'react';
-import { ArrowRight, Heart, Share2, Star, Clock, Flame, Minus, Plus, Zap, MessageSquare } from 'lucide-react';
-import { Product } from '../types';
+
+import React, { useState, useRef, useEffect } from 'react';
+import { ArrowRight, Heart, Share2, Star, Clock, Flame, Minus, Plus, Zap, MessageSquare, Store } from 'lucide-react';
+import { Product, Seller } from '../types';
 
 interface ProductPageProps {
   product: Product;
+  seller?: Seller;
   onBack: () => void;
   onAddToCart: (product: Product, quantity: number) => void;
 }
 
-export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack, onAddToCart }) => {
+export const ProductPage: React.FC<ProductPageProps> = ({ product, seller, onBack, onAddToCart }) => {
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [animateDelivery, setAnimateDelivery] = useState(false);
 
   const triggerHaptic = (ms: number = 10) => {
     if (typeof navigator !== 'undefined' && navigator.vibrate) {
       navigator.vibrate(ms);
     }
   };
+
+  // Reset scroll position when product changes
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ left: 0, behavior: 'auto' });
+      setActiveImageIndex(0);
+    }
+    // Trigger animation for delivery bar
+    setAnimateDelivery(false);
+    setTimeout(() => setAnimateDelivery(true), 100);
+  }, [product.id]);
 
   const increment = () => {
     setQuantity(q => q + 1);
@@ -35,15 +50,51 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack, onAdd
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const width = e.currentTarget.offsetWidth;
     const scrollLeft = e.currentTarget.scrollLeft;
+    // Calculate index based on scroll position
     const index = Math.round(Math.abs(scrollLeft) / width);
     setActiveImageIndex(index);
   };
+
+  const scrollToImage = (index: number) => {
+    if (scrollContainerRef.current) {
+      const width = scrollContainerRef.current.offsetWidth;
+      scrollContainerRef.current.scrollTo({
+        left: width * index,
+        behavior: 'smooth'
+      });
+      // State update happens in onScroll, but we can optimistically set it here too if needed
+    }
+  };
+
+  // Calculate delivery metrics
+  const getDeliveryMetrics = () => {
+    const timeStr = seller?.deliveryTime || '30';
+    const matches = timeStr.match(/\d+/g);
+    let avgMinutes = 30;
+    
+    if (matches && matches.length > 0) {
+       const nums = matches.map(Number);
+       avgMinutes = nums.reduce((a, b) => a + b, 0) / nums.length;
+    }
+
+    // Scale: 60 mins = 100% width usually, but let's say max usually 90 mins for UI scaling
+    const percent = Math.min(100, (avgMinutes / 60) * 100);
+    
+    let color = 'bg-emerald-500';
+    if (avgMinutes > 45) color = 'bg-red-500';
+    else if (avgMinutes > 30) color = 'bg-amber-500';
+
+    return { percent, color, avgMinutes };
+  };
+
+  const { percent: deliveryPercent, color: deliveryColor } = getDeliveryMetrics();
 
   return (
     <div className="min-h-screen bg-white pb-24 animate-in slide-in-from-left-4 duration-300">
       {/* Header Image Carousel & Nav */}
       <div className="relative h-72 bg-slate-200">
         <div 
+           ref={scrollContainerRef}
            className="w-full h-full flex overflow-x-auto snap-x snap-mandatory scrollbar-hide [&::-webkit-scrollbar]:hidden" 
            dir="ltr" // Force LTR for consistent horizontal scrolling physics
            onScroll={handleScroll}
@@ -76,11 +127,16 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack, onAdd
 
         {/* Dots Indicator */}
         {images.length > 1 && (
-          <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
+          <div 
+            className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10"
+            dir="ltr" // Ensure dots direction matches carousel (LTR)
+          >
             {images.map((_, i) => (
-              <div 
+              <button 
                 key={i} 
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${i === activeImageIndex ? 'bg-white w-4' : 'bg-white/50'}`} 
+                onClick={(e) => { e.stopPropagation(); scrollToImage(i); }}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${i === activeImageIndex ? 'bg-white w-4' : 'bg-white/50 hover:bg-white/80'}`} 
+                aria-label={`Go to image ${i + 1}`}
               />
             ))}
           </div>
@@ -94,18 +150,49 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack, onAdd
             <div className="text-xl font-bold text-amber-600 whitespace-nowrap">{product.price} ر.س</div>
           </div>
           
-          <div className="flex items-center gap-4 text-sm text-slate-500 mb-4">
+          <div className="flex items-center gap-6 text-sm text-slate-500 mb-2">
              <div className="flex items-center gap-1">
                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
                <span className="font-bold text-slate-700">{product.rating}</span>
                <span className="text-slate-400">(٥٠+ تقييم)</span>
              </div>
-             <div className="flex items-center gap-1">
-               <Clock className="w-4 h-4" />
-               <span>٢٠-٣٠ دقيقة</span>
+             
+             {/* Delivery Time & Bar */}
+             <div className="flex flex-col gap-1.5 flex-1 max-w-[140px]">
+               <div className="flex items-center gap-1">
+                 <Clock className="w-4 h-4 text-slate-400" />
+                 <span className="font-bold text-slate-700 text-xs">{seller?.deliveryTime || '٣٠ دقيقة'}</span>
+               </div>
+               {/* Animated Progress Bar */}
+               <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                 <div 
+                   className={`h-full ${deliveryColor} rounded-full transition-all duration-1000 ease-out`}
+                   style={{ width: animateDelivery ? `${deliveryPercent}%` : '0%' }}
+                 />
+               </div>
              </div>
           </div>
         </div>
+
+        {/* Seller Info Section */}
+        {seller && (
+          <div className="px-6 py-4 flex items-center gap-3 border-b border-slate-50">
+             <div className="relative">
+                <img src={seller.image} alt={seller.nameAr} className="w-12 h-12 rounded-full object-cover border border-slate-200" />
+                <div className="absolute -bottom-1 -right-1 bg-amber-500 text-white p-0.5 rounded-full border-2 border-white">
+                    <Store className="w-3 h-3" />
+                </div>
+             </div>
+             <div>
+                <p className="text-xs text-slate-400 font-medium">إعداد وتقديم</p>
+                <h3 className="font-bold text-slate-800">{seller.nameAr}</h3>
+             </div>
+             <div className="mr-auto flex items-center gap-1 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
+                <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                <span className="text-xs font-bold text-slate-700">{seller.rating}</span>
+             </div>
+          </div>
+        )}
 
         {/* Description */}
         <div className="p-6 border-b border-slate-100">

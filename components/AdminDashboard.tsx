@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { User, Seller, Product, Category, Order } from '../types';
 import { 
@@ -399,7 +400,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             <th className="p-4 text-xs font-semibold text-slate-500 w-20">الصورة</th>
                             <th className="p-4 text-xs font-semibold text-slate-500">تفاصيل المنتج</th>
                             <th className="p-4 text-xs font-semibold text-slate-500">السعر</th>
-                            <th className="p-4 text-xs font-semibold text-slate-500">القسم</th>
+                            <th className="p-4 text-xs font-semibold text-slate-500">الأسرة المنتجة</th>
                             <th className="p-4 text-xs font-semibold text-slate-500">الحالة</th>
                             <th className="p-4 text-xs font-semibold text-slate-500">الإجراءات</th>
                         </tr>
@@ -417,13 +418,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                     <td className="p-4">
                                         <div className="font-bold text-slate-800 text-sm">{product.nameAr}</div>
                                         <div className="text-xs text-slate-500 mt-1 line-clamp-1 max-w-[200px]">{product.descriptionAr}</div>
-                                        {seller && <div className="text-[10px] text-amber-600 mt-1 flex items-center gap-1"><Store className="w-3 h-3"/> {seller.nameAr}</div>}
                                     </td>
                                     <td className="p-4 font-bold text-slate-800">{product.price} ر.س</td>
                                     <td className="p-4">
-                                        <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs">
-                                            عام
-                                        </span>
+                                         {seller ? (
+                                             <div className="flex items-center gap-1.5 text-xs text-slate-700 font-medium">
+                                                 <img src={seller.image} className="w-5 h-5 rounded-full object-cover" />
+                                                 {seller.nameAr}
+                                             </div>
+                                         ) : (
+                                             <span className="text-xs text-slate-400">غير محدد</span>
+                                         )}
                                     </td>
                                     <td className="p-4">
                                         <div className="flex items-center gap-1">
@@ -558,6 +563,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                         onChange={e => setEditingProduct({...editingProduct, price: Number(e.target.value)})}
                                         className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none"
                                     />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">الأسرة المنتجة (البائع)</label>
+                                    <div className="relative">
+                                        <select 
+                                            value={editingProduct?.sellerId || ''} 
+                                            onChange={e => setEditingProduct({...editingProduct, sellerId: e.target.value})}
+                                            className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none appearance-none"
+                                        >
+                                            <option value="">اختر الأسرة المنتجة...</option>
+                                            {sellers.map(s => (
+                                                <option key={s.id} value={s.id}>{s.nameAr}</option>
+                                            ))}
+                                        </select>
+                                        <ChevronDown className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">الوصف</label>
