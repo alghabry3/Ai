@@ -13,7 +13,8 @@ import {
     Save,
     X,
     Search,
-    ShoppingBag
+    ShoppingBag,
+    Clock
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -213,7 +214,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             <h3 className="font-bold text-lg text-slate-800">{seller.nameAr}</h3>
                             <p className="text-sm text-slate-500">{seller.cuisine}</p>
                             <div className="mt-4 flex gap-2 text-xs font-medium text-slate-400">
-                                <span className="bg-slate-100 px-2 py-1 rounded-md">{seller.deliveryTime}</span>
+                                <span className="bg-slate-100 px-2 py-1 rounded-md flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    {seller.deliveryTime}
+                                </span>
                                 <span className="bg-amber-50 text-amber-600 px-2 py-1 rounded-md">★ {seller.rating}</span>
                             </div>
                         </div>
@@ -385,6 +389,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                         value={editingSeller?.deliveryTime || ''} 
                                         onChange={e => setEditingSeller({...editingSeller, deliveryTime: e.target.value})}
                                         className="w-full border p-2 rounded-lg mt-1"
+                                        placeholder="مثال: 30-45 دقيقة"
                                     />
                                 </div>
                                 <div>
