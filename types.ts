@@ -1,5 +1,5 @@
 // Domain Types
-export type UserRole = 'customer' | 'seller' | 'driver';
+export type UserRole = 'customer' | 'seller' | 'driver' | 'admin';
 
 export interface User {
     id: string;
@@ -27,6 +27,8 @@ export interface Product {
         fats: string;
     };
     images?: string[];
+    sellerId?: string; // Link product to a seller
+    categoryId?: string;
 }
 
 export interface Category {

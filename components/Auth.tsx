@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User, UserRole } from '../types';
-import { User as UserIcon, Lock, Phone, Mail, ChevronRight } from 'lucide-react';
+import { User as UserIcon, Lock, Phone, Mail, ChevronRight, ShieldCheck } from 'lucide-react';
 
 interface AuthProps {
   onLogin: (user: User) => void;
@@ -11,6 +11,7 @@ interface AuthProps {
 export const Auth: React.FC<AuthProps> = ({ onLogin, onRegister, onBack }) => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [role, setRole] = useState<UserRole>('customer');
+  const [error, setError] = useState('');
   
   // Form State
   const [name, setName] = useState('');
@@ -20,21 +21,41 @@ export const Auth: React.FC<AuthProps> = ({ onLogin, onRegister, onBack }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     
-    // Simulating API Call
+    // Admin Login Check
+    if (!isRegistering && email === 'admin' && password === 'admin') {
+        const adminUser: User = {
+            id: 'admin-master',
+            name: 'مدير النظام',
+            email: 'admin',
+            phone: '0000000000',
+            role: 'admin',
+            password: 'admin'
+        };
+        onLogin(adminUser);
+        return;
+    }
+
+    // Validation
+    if (!email || !password) {
+        setError('يرجى تعبئة جميع الحقول المطلوبة');
+        return;
+    }
+
     const userData: User = {
       id: Math.random().toString(36).substr(2, 9),
-      name,
+      name: name || 'مستخدم جديد',
       email,
       phone,
       role,
-      password // storing for demo only
+      password 
     };
 
     if (isRegistering) {
+      if (!name) { setError('الاسم مطلوب'); return; }
       onRegister(userData);
     } else {
-      // For demo, we just log them in with the entered data if not verifying against a DB
       onLogin(userData); 
     }
   };
@@ -46,12 +67,22 @@ export const Auth: React.FC<AuthProps> = ({ onLogin, onRegister, onBack }) => {
       </button>
 
       <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">
-          {isRegistering ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}
-        </h1>
+        <div className="flex items-center gap-2 mb-2">
+            <h1 className="text-3xl font-bold text-slate-900">
+            {isRegistering ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}
+            </h1>
+            {!isRegistering && <ShieldCheck className="w-6 h-6 text-slate-300" />}
+        </div>
+        
         <p className="text-slate-500 mb-8">
           {isRegistering ? 'أدخل بياناتك للبدء في استخدام سفرة' : 'مرحباً بعودتك!'}
         </p>
+
+        {error && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm mb-4 border border-red-100">
+                {error}
+            </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {isRegistering && (
@@ -60,7 +91,6 @@ export const Auth: React.FC<AuthProps> = ({ onLogin, onRegister, onBack }) => {
               <div className="relative">
                 <input 
                   type="text" 
-                  required 
                   value={name}
                   onChange={e => setName(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-10 focus:ring-2 focus:ring-amber-500 outline-none"
@@ -72,11 +102,12 @@ export const Auth: React.FC<AuthProps> = ({ onLogin, onRegister, onBack }) => {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">البريد الإلكتروني</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+                {email === 'admin' ? 'اسم المستخدم' : 'البريد الإلكتروني'}
+            </label>
             <div className="relative">
               <input 
-                type="email" 
-                required 
+                type="text" 
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-10 focus:ring-2 focus:ring-amber-500 outline-none"
@@ -92,7 +123,6 @@ export const Auth: React.FC<AuthProps> = ({ onLogin, onRegister, onBack }) => {
               <div className="relative">
                 <input 
                   type="tel" 
-                  required 
                   value={phone}
                   onChange={e => setPhone(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-10 focus:ring-2 focus:ring-amber-500 outline-none"
@@ -108,7 +138,6 @@ export const Auth: React.FC<AuthProps> = ({ onLogin, onRegister, onBack }) => {
             <div className="relative">
               <input 
                 type="password" 
-                required 
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-10 focus:ring-2 focus:ring-amber-500 outline-none"
@@ -154,7 +183,7 @@ export const Auth: React.FC<AuthProps> = ({ onLogin, onRegister, onBack }) => {
           <p className="text-slate-500 text-sm">
             {isRegistering ? 'لديك حساب بالفعل؟' : 'ليس لديك حساب؟'}
             <button 
-              onClick={() => setIsRegistering(!isRegistering)}
+              onClick={() => { setIsRegistering(!isRegistering); setError(''); }}
               className="mr-1 text-amber-600 font-bold hover:underline"
             >
               {isRegistering ? 'تسجيل الدخول' : 'إنشاء حساب جديد'}

@@ -4,6 +4,7 @@ import { ProductPage } from './components/ProductPage';
 import { Auth } from './components/Auth';
 import { Cart } from './components/Cart';
 import { Profile } from './components/Profile';
+import { AdminDashboard } from './components/AdminDashboard';
 import { 
   ShoppingBag, 
   Search, 
@@ -17,8 +18,8 @@ import {
 } from 'lucide-react';
 import { Product, Category, Seller, User, CartItem, Order, UserRole } from './types';
 
-// --- MOCK DATA ---
-const CATEGORIES: Category[] = [
+// --- MOCK INITIAL DATA ---
+const INITIAL_CATEGORIES: Category[] = [
   { id: '1', nameAr: 'برجر', icon: '🍔' },
   { id: '2', nameAr: 'بيتزا', icon: '🍕' },
   { id: '3', nameAr: 'شاورما', icon: '🥙' },
@@ -26,13 +27,13 @@ const CATEGORIES: Category[] = [
   { id: '5', nameAr: 'حلويات', icon: '🍩' },
 ];
 
-const SELLERS: Seller[] = [
+const INITIAL_SELLERS: Seller[] = [
   { id: '1', nameAr: 'برجر كنج', cuisine: 'وجبات سريعة', deliveryTime: '25-35 دقيقة', rating: 4.5, image: 'https://picsum.photos/seed/burger/400/250' },
   { id: '2', nameAr: 'بيتزا هت', cuisine: 'إيطالي', deliveryTime: '30-45 دقيقة', rating: 4.2, image: 'https://picsum.photos/seed/pizza/400/250' },
   { id: '3', nameAr: 'شاورما كلاسيك', cuisine: 'عربي', deliveryTime: '15-25 دقيقة', rating: 4.8, image: 'https://picsum.photos/seed/shawarma/400/250' },
 ];
 
-const POPULAR_PRODUCTS: Product[] = [
+const INITIAL_PRODUCTS: Product[] = [
   { 
     id: '1', 
     nameAr: 'وجبة دجاج عائلي', 
@@ -47,7 +48,9 @@ const POPULAR_PRODUCTS: Product[] = [
     rating: 4.7,
     longDescriptionAr: 'استمتع بوجبة عائلية متكاملة تكفي الجميع! ١٢ قطعة من الدجاج المقرمش المتبل بخلطتنا السرية، يقدم مع بطاطس ذهبية مقلية ومشروب كولا عائلي بارد. الخيار الأمثل للتجمعات.',
     ingredientsAr: ['دجاج طازج', 'دقيق القمح', 'توابل خاصة', 'زيت نباتي', 'بطاطس', 'ملح'],
-    nutrition: { calories: 1200, protein: '45g', carbs: '110g', fats: '55g' }
+    nutrition: { calories: 1200, protein: '45g', carbs: '110g', fats: '55g' },
+    sellerId: '1',
+    categoryId: '1'
   },
   { 
     id: '2', 
@@ -62,24 +65,33 @@ const POPULAR_PRODUCTS: Product[] = [
     rating: 4.5,
     longDescriptionAr: 'بيتزا سوبر سوبريم الغنية بالمكونات! طبقة غنية من صلصة الطماطم وجبنة الموزاريلا، مغطاة بقطع البيبروني، اللحم المفروم، الفطر، الفلفل الأخضر، والزيتون الأسود. تأتيكم بأطراف محشوة بالجبنة اللذيذة.',
     ingredientsAr: ['عجينة البيتزا', 'صلصة طماطم', 'جبنة موزاريلا', 'بيبروني', 'لحم بقري', 'فطر', 'فلفل أخضر', 'زيتون'],
-    nutrition: { calories: 280, protein: '12g', carbs: '35g', fats: '10g' } 
+    nutrition: { calories: 280, protein: '12g', carbs: '35g', fats: '10g' },
+    sellerId: '2',
+    categoryId: '2'
   },
 ];
 
 // View Router Enum
-type AppView = 'home' | 'product' | 'cart' | 'profile' | 'auth';
+type AppView = 'home' | 'product' | 'cart' | 'profile' | 'auth' | 'admin';
 
 const App: React.FC = () => {
-  // --- STATE MANAGEMENT ---
+  // --- GLOBAL DATA STATE ---
+  // Lifted up so AdminDashboard can edit them
+  const [sellers, setSellers] = useState<Seller[]>(INITIAL_SELLERS);
+  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
+  const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES);
+  const [users, setUsers] = useState<User[]>([]);
+
+  // --- APP STATE ---
   const [currentView, setCurrentView] = useState<AppView>('home');
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   
-  // Data Store
-  const [users, setUsers] = useState<User[]>([]);
+  // Auth & Cart State
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [adminPassword, setAdminPassword] = useState('admin');
 
   // Init Demo Data
   useEffect(() => {
@@ -97,20 +109,37 @@ const App: React.FC = () => {
   const handleRegister = (user: User) => {
     setUsers([...users, user]);
     setCurrentUser(user);
-    setCurrentView('home');
+    setCurrentView(user.role === 'admin' ? 'admin' : 'home');
   };
 
   const handleLogin = (user: User) => {
-    // In a real app, verify credentials. Here we just simulate login or find existing.
+    // Special check for master admin override
+    if (user.role === 'admin' && user.email === 'admin') {
+         // Verify against local dynamic password state
+         if (user.password !== adminPassword) {
+             alert('كلمة المرور غير صحيحة');
+             return;
+         }
+         setCurrentUser(user);
+         setCurrentView('admin');
+         return;
+    }
+
+    // Standard user flow
     const existing = users.find(u => u.email === user.email);
     if (existing) {
       setCurrentUser(existing);
+      if (existing.role === 'admin') {
+          setCurrentView('admin');
+      } else {
+          setCurrentView('home');
+      }
     } else {
       // Auto-register for demo simplicity
       setUsers([...users, user]);
       setCurrentUser(user);
+      setCurrentView('home');
     }
-    setCurrentView('home');
   };
 
   const handleLogout = () => {
@@ -159,14 +188,8 @@ const App: React.FC = () => {
     setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
   };
 
-  // --- NAVIGATION HELPERS ---
-
   const navigateToProduct = (product: Product) => {
     setSelectedProduct(product);
-    // Note: In our simple router, product view is overlay or handled via selectedProduct state
-    // But let's verify if we need to change currentView.
-    // The current conditional rendering checks `selectedProduct` first.
-    // So setting selectedProduct is enough.
   };
 
   // --- RENDERERS ---
@@ -183,7 +206,25 @@ const App: React.FC = () => {
     );
   }
 
-  // 3. Check Cart View
+  // 3. Admin Dashboard View
+  if (currentView === 'admin' && currentUser?.role === 'admin') {
+      return (
+          <AdminDashboard 
+            users={users}
+            setUsers={setUsers}
+            sellers={sellers}
+            setSellers={setSellers}
+            products={products}
+            setProducts={setProducts}
+            orders={orders}
+            adminUser={currentUser}
+            onLogout={handleLogout}
+            onUpdateAdminPassword={setAdminPassword}
+          />
+      );
+  }
+
+  // 4. Check Cart View
   if (currentView === 'cart') {
     return (
       <Cart 
@@ -197,7 +238,7 @@ const App: React.FC = () => {
     );
   }
 
-  // 4. Check Profile View
+  // 5. Check Profile View
   if (currentView === 'profile') {
     if (!currentUser) {
       // Redirect to auth if trying to access profile while logged out
@@ -218,7 +259,7 @@ const App: React.FC = () => {
     );
   }
 
-  // 5. Check Product View (Overlay logic)
+  // 6. Check Product View (Overlay logic)
   if (selectedProduct) {
     return (
       <ProductPage 
@@ -229,7 +270,7 @@ const App: React.FC = () => {
     );
   }
 
-  // 6. Default: Home View
+  // 7. Default: Home View
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
       
@@ -280,15 +321,20 @@ const App: React.FC = () => {
 
           <main className="px-4 pt-6 space-y-8">
             
-            {/* Seller/Driver Dashboard Access Hint */}
+            {/* Seller/Driver/Admin Dashboard Access Hint */}
             {currentUser && currentUser.role !== 'customer' && (
                <div 
-                 onClick={() => setCurrentView('profile')}
+                 onClick={() => {
+                     if (currentUser.role === 'admin') setCurrentView('admin');
+                     else setCurrentView('profile');
+                 }}
                  className="bg-slate-900 text-white p-4 rounded-2xl shadow-lg cursor-pointer flex justify-between items-center"
                >
                   <div>
                     <h3 className="font-bold">لوحة التحكم</h3>
-                    <p className="text-xs text-slate-400">تابع الطلبات والمهام الخاصة بك</p>
+                    <p className="text-xs text-slate-400">
+                        {currentUser.role === 'admin' ? 'إدارة النظام بالكامل' : 'تابع الطلبات والمهام الخاصة بك'}
+                    </p>
                   </div>
                   <UserIcon className="w-6 h-6" />
                </div>
@@ -298,7 +344,7 @@ const App: React.FC = () => {
             <section>
               <h2 className="text-lg font-bold text-slate-800 mb-4">التصنيفات</h2>
               <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-                {CATEGORIES.map(cat => (
+                {categories.map(cat => (
                   <div key={cat.id} className="flex-shrink-0 flex flex-col items-center gap-2 cursor-pointer group">
                     <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-2xl border border-slate-100 group-hover:border-amber-500 group-hover:shadow-md transition-all">
                       {cat.icon}
@@ -316,7 +362,7 @@ const App: React.FC = () => {
                  <a href="#" className="text-sm text-amber-600 font-medium">عرض الكل</a>
               </div>
               <div className="space-y-4">
-                {SELLERS.map(seller => (
+                {sellers.map(seller => (
                   <div key={seller.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-md transition-shadow cursor-pointer">
                     <div className="relative h-32 w-full">
                       <img src={seller.image} alt={seller.nameAr} className="w-full h-full object-cover" />
@@ -344,7 +390,7 @@ const App: React.FC = () => {
             <section>
               <h2 className="text-lg font-bold text-slate-800 mb-4">الأكثر طلباً</h2>
               <div className="grid grid-cols-2 gap-4">
-                {POPULAR_PRODUCTS.map(product => (
+                {products.map(product => (
                   <div 
                     key={product.id} 
                     onClick={() => navigateToProduct(product)}
