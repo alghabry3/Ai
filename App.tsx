@@ -287,16 +287,18 @@ export const App: React.FC = () => {
 
   return (
     <>
-      <div className="max-w-md mx-auto min-h-screen bg-slate-50 shadow-2xl overflow-hidden relative">
+      <div className="min-h-screen bg-slate-50 shadow-sm overflow-x-hidden relative font-sans text-slate-900">
         
         {/* Render View based on activeView State */}
         
         {activeView === 'auth' && (
-          <Auth 
-             onLogin={handleLogin} 
-             onRegister={(u) => { handleLogin(u); }} 
-             onBack={() => setActiveView('home')} 
-          />
+          <div className="max-w-md mx-auto min-h-screen bg-white shadow-2xl md:my-8 md:min-h-0 md:rounded-3xl md:overflow-hidden">
+             <Auth 
+               onLogin={handleLogin} 
+               onRegister={(u) => { handleLogin(u); }} 
+               onBack={() => setActiveView('home')} 
+             />
+          </div>
         )}
 
         {activeView === 'admin' && user?.role === 'admin' && (
@@ -312,25 +314,29 @@ export const App: React.FC = () => {
         )}
 
         {activeView === 'cart' && (
-          <Cart 
-            items={cart} 
-            onRemove={removeFromCart} 
-            onCheckout={handleCheckout} 
-            onBack={() => setActiveView('home')} 
-            user={user}
-            onLoginReq={() => setActiveView('auth')}
-          />
+          <div className="max-w-2xl mx-auto bg-white min-h-screen md:min-h-0 md:my-8 md:rounded-3xl shadow-xl overflow-hidden">
+             <Cart 
+               items={cart} 
+               onRemove={removeFromCart} 
+               onCheckout={handleCheckout} 
+               onBack={() => setActiveView('home')} 
+               user={user}
+               onLoginReq={() => setActiveView('auth')}
+             />
+          </div>
         )}
 
         {activeView === 'profile' && user && (
-          <Profile 
-            user={user} 
-            orders={orders} 
-            onLogout={() => { setUser(null); setActiveView('home'); }} 
-            onStatusUpdate={(orderId, status) => {
-                setOrders(orders.map(o => o.id === orderId ? { ...o, status } : o));
-            }}
-          />
+          <div className="max-w-3xl mx-auto bg-white min-h-screen md:min-h-0 md:my-8 md:rounded-3xl shadow-xl overflow-hidden">
+             <Profile 
+               user={user} 
+               orders={orders} 
+               onLogout={() => { setUser(null); setActiveView('home'); }} 
+               onStatusUpdate={(orderId, status) => {
+                   setOrders(orders.map(o => o.id === orderId ? { ...o, status } : o));
+               }}
+             />
+          </div>
         )}
 
         {activeView === 'seller' && selectedSeller && (
@@ -355,256 +361,282 @@ export const App: React.FC = () => {
         {activeView === 'home' && (
           <div className="pb-24 animate-in fade-in">
             {/* Header */}
-            <header className="bg-white p-6 sticky top-0 z-10 shadow-sm">
-              <div className="flex justify-between items-center mb-4">
-                <div>
-                  <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                    <span className="bg-amber-500 text-white p-1 rounded-lg">س</span>
-                    سفرة
-                  </h1>
-                  <div className="flex items-center gap-1 text-xs text-slate-500 mt-1">
-                    <MapPin className="w-3 h-3" />
-                    <span>الرياض، السعودية</span>
+            <header className="bg-white p-4 sticky top-0 z-20 shadow-sm">
+              <div className="max-w-7xl mx-auto">
+                <div className="flex justify-between items-center mb-4">
+                  <div className="flex items-center gap-8">
+                    <div>
+                      <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <span className="bg-amber-500 text-white p-1 rounded-lg">س</span>
+                        سفرة
+                      </h1>
+                      <div className="flex items-center gap-1 text-xs text-slate-500 mt-1">
+                        <MapPin className="w-3 h-3" />
+                        <span>الرياض، السعودية</span>
+                      </div>
+                    </div>
+                    {/* Desktop Navigation */}
+                    <nav className="hidden md:flex gap-6 text-sm font-medium text-slate-600">
+                        <button onClick={() => { setActiveView('home'); triggerHaptic(); }} className="hover:text-amber-600 transition-colors">الرئيسية</button>
+                        <button onClick={() => { setActiveView('profile'); triggerHaptic(); }} className="hover:text-amber-600 transition-colors">طلباتي</button>
+                        <button className="hover:text-amber-600 transition-colors">المفضلة</button>
+                    </nav>
+                  </div>
+
+                  <div className="flex gap-2">
+                      {user ? (
+                          <button onClick={() => setActiveView('profile')} className="p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors">
+                              <UserIcon className="w-5 h-5 text-slate-600" />
+                          </button>
+                      ) : (
+                          <button onClick={() => setActiveView('auth')} className="px-4 py-2 bg-slate-900 text-white rounded-full text-xs font-bold hover:bg-slate-800 transition-colors">
+                              دخول
+                          </button>
+                      )}
+                      <button onClick={() => setActiveView('cart')} className="p-2 bg-slate-100 rounded-full relative hover:bg-slate-200 transition-colors">
+                          <ShoppingBag className="w-5 h-5 text-slate-600" />
+                          {cart.length > 0 && (
+                          <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-white text-[10px] flex items-center justify-center rounded-full font-bold">
+                              {cart.length}
+                          </span>
+                          )}
+                      </button>
                   </div>
                 </div>
+
+                {/* Search Bar */}
                 <div className="flex gap-2">
-                    {user ? (
-                        <button onClick={() => setActiveView('profile')} className="p-2 bg-slate-100 rounded-full hover:bg-slate-200">
-                            <UserIcon className="w-5 h-5 text-slate-600" />
-                        </button>
-                    ) : (
-                        <button onClick={() => setActiveView('auth')} className="px-4 py-2 bg-slate-900 text-white rounded-full text-xs font-bold hover:bg-slate-800">
-                            دخول
-                        </button>
-                    )}
-                    <button onClick={() => setActiveView('cart')} className="p-2 bg-slate-100 rounded-full relative hover:bg-slate-200">
-                        <ShoppingBag className="w-5 h-5 text-slate-600" />
-                        {cart.length > 0 && (
-                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-white text-[10px] flex items-center justify-center rounded-full font-bold">
-                            {cart.length}
-                        </span>
-                        )}
-                    </button>
+                  <div className="relative flex-1">
+                    <Search className="absolute right-3 top-3 w-5 h-5 text-slate-400" />
+                    <input 
+                      type="text" 
+                      placeholder="ابحث عن وجبتك المفضلة..." 
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-10 text-right focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm transition-all"
+                    />
+                  </div>
+                  <button 
+                    onClick={() => { setShowFilters(!showFilters); triggerHaptic(); }}
+                    className={`p-3 rounded-xl border transition-all ${showFilters ? 'bg-amber-50 border-amber-200 text-amber-600' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                  >
+                    <SlidersHorizontal className="w-5 h-5" />
+                  </button>
                 </div>
-              </div>
 
-              {/* Search Bar */}
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute right-3 top-3 w-5 h-5 text-slate-400" />
-                  <input 
-                    type="text" 
-                    placeholder="ابحث عن وجبتك المفضلة..." 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-10 text-right focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm"
-                  />
-                </div>
-                <button 
-                  onClick={() => { setShowFilters(!showFilters); triggerHaptic(); }}
-                  className={`p-3 rounded-xl border transition-colors ${showFilters ? 'bg-amber-50 border-amber-200 text-amber-600' : 'bg-white border-slate-200 text-slate-500'}`}
-                >
-                  <SlidersHorizontal className="w-5 h-5" />
-                </button>
+                {/* Advanced Filters Panel */}
+                {showFilters && (
+                  <div className="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-100 animate-in slide-in-from-top-2">
+                    <div className="flex justify-between items-center mb-3">
+                        <h3 className="font-bold text-slate-700 text-sm">تصفية حسب السعر</h3>
+                        <button onClick={() => { setMinPrice(0); setMaxPrice(500); setSelectedCategoryId(null); }} className="text-xs text-red-500 flex items-center gap-1 hover:underline">
+                          <FilterX className="w-3 h-3" /> مسح الكل
+                        </button>
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-slate-600">
+                        <span>{minPrice} ر.س</span>
+                        <input 
+                          type="range" 
+                          min="0" 
+                          max="500" 
+                          value={maxPrice} 
+                          onChange={(e) => setMaxPrice(Number(e.target.value))}
+                          className="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500" 
+                        />
+                        <span>{maxPrice} ر.س</span>
+                    </div>
+                  </div>
+                )}
               </div>
-
-              {/* Advanced Filters Panel */}
-              {showFilters && (
-                <div className="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-100 animate-in slide-in-from-top-2">
-                   <div className="flex justify-between items-center mb-3">
-                      <h3 className="font-bold text-slate-700 text-sm">تصفية حسب السعر</h3>
-                      <button onClick={() => { setMinPrice(0); setMaxPrice(500); setSelectedCategoryId(null); }} className="text-xs text-red-500 flex items-center gap-1">
-                        <FilterX className="w-3 h-3" /> مسح الكل
-                      </button>
-                   </div>
-                   <div className="flex items-center gap-4 text-sm text-slate-600">
-                      <span>{minPrice} ر.س</span>
-                      <input 
-                        type="range" 
-                        min="0" 
-                        max="500" 
-                        value={maxPrice} 
-                        onChange={(e) => setMaxPrice(Number(e.target.value))}
-                        className="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500" 
-                      />
-                      <span>{maxPrice} ر.س</span>
-                   </div>
-                </div>
-              )}
             </header>
 
-            {/* Hero Section */}
-            {!searchTerm && !selectedCategoryId && (
-                <div className="mt-4 px-6 mb-8">
-                    <div className="bg-slate-900 rounded-3xl p-6 text-white relative overflow-hidden shadow-xl">
-                        <div className="relative z-10">
-                            <span className="bg-amber-500 text-white text-[10px] font-bold px-2 py-1 rounded mb-2 inline-block">عروض اليوم</span>
-                            <h2 className="text-2xl font-bold mb-1">أطباق الأسر المنتجة</h2>
-                            <p className="text-slate-300 text-sm mb-4">طعم البيت الأصيل يوصلك لباب بيتك</p>
-                            <button className="bg-white text-slate-900 px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-100">تصفح العروض</button>
-                        </div>
-                        <img src="https://images.unsplash.com/photo-1547924475-f9e25c02c05e?auto=format&fit=crop&q=80&w=400" className="absolute top-0 left-0 w-48 h-full object-cover opacity-50 mask-image-gradient" />
-                    </div>
-                </div>
-            )}
-
-            {/* Categories */}
-            <div className="px-6 mb-8">
-              <h2 className="text-lg font-bold text-slate-800 mb-4">التصنيفات</h2>
-              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-                {categories.map(cat => (
-                  <button 
-                    key={cat.id} 
-                    onClick={() => {
-                        setSelectedCategoryId(selectedCategoryId === cat.id ? null : cat.id);
-                        triggerHaptic();
-                    }}
-                    className={`flex flex-col items-center gap-2 min-w-[80px] p-2 rounded-2xl transition-all ${
-                        selectedCategoryId === cat.id 
-                        ? 'bg-amber-100 scale-105 border-2 border-amber-200' 
-                        : 'hover:bg-slate-50'
-                    }`}
-                  >
-                    <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-2xl border border-slate-100">
-                      {cat.icon}
-                    </div>
-                    <span className={`text-xs font-medium ${selectedCategoryId === cat.id ? 'text-amber-700 font-bold' : 'text-slate-600'}`}>{cat.nameAr}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Featured Sellers (Horizontal Carousel) */}
-            {!selectedCategoryId && !searchTerm && (
-                <div className="mb-8">
-                    <div className="px-6 mb-4 flex justify-between items-center">
-                        <h2 className="text-lg font-bold text-slate-800">أسر منتجة مميزة</h2>
-                        <button className="text-amber-600 text-sm font-bold">عرض الكل</button>
-                    </div>
-                    <div className="flex overflow-x-auto gap-4 px-6 pb-4 snap-x snap-mandatory scrollbar-hide">
-                        {featuredSellers.map(seller => (
-                            <div 
-                                key={seller.id} 
-                                onClick={() => navigateToSeller(seller)}
-                                className="min-w-[280px] snap-center bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden cursor-pointer active:scale-95 transition-transform group"
-                            >
-                                <div className="h-32 relative overflow-hidden">
-                                    <img 
-                                        src={seller.image} 
-                                        alt={seller.nameAr} 
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
-                                        loading="lazy"
-                                    />
-                                    <div className="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-sm">
-                                        <Clock className="w-3 h-3 text-amber-500" />
-                                        {seller.deliveryTime}
-                                    </div>
-                                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors"></div>
-                                </div>
-                                <div className="p-4">
-                                    <div className="flex justify-between items-start mb-1">
-                                        <h3 className="font-bold text-slate-800 text-lg">{seller.nameAr}</h3>
-                                        <div className="flex items-center gap-1 bg-amber-50 px-1.5 py-0.5 rounded text-amber-700 font-bold text-xs">
-                                            <span>{seller.rating}</span>
-                                            <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
-                                        </div>
-                                    </div>
-                                    <p className="text-xs text-slate-500 mb-3">{seller.cuisine}</p>
-                                    <div className="flex gap-2">
-                                        <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded-full">توصيل مجاني</span>
-                                        <span className="text-[10px] bg-red-50 text-red-600 px-2 py-1 rounded-full">خصم 20%</span>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* Popular Items */}
-            <div className="px-6">
-              <h2 className="text-lg font-bold text-slate-800 mb-4">
-                  {selectedCategoryId 
-                    ? `نتائج التصنيف (${displayedProducts.length})` 
-                    : (searchTerm ? `نتائج البحث (${displayedProducts.length})` : 'الأكثر طلباً')
-                  }
-              </h2>
-              
-              {displayedProducts.length === 0 ? (
-                  <div className="text-center py-10 bg-white rounded-2xl border border-dashed border-slate-200">
-                      <p className="text-slate-500">لا توجد منتجات مطابقة للبحث</p>
-                      <button onClick={() => {setSearchTerm(''); setMinPrice(0); setMaxPrice(500); setSelectedCategoryId(null);}} className="text-amber-600 text-sm font-bold mt-2 hover:underline">إزالة الفلاتر</button>
-                  </div>
-              ) : (
-                  <div className="grid grid-cols-2 gap-4">
-                    {displayedProducts.map(product => {
-                      const seller = sellers.find(s => s.id === product.sellerId);
-                      return (
-                        <div 
-                          key={product.id} 
-                          onClick={() => navigateToProduct(product)}
-                          className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 cursor-pointer active:scale-95 transition-transform"
-                        >
-                          <div className="relative mb-3">
-                            <img src={product.image} alt={product.nameAr} className="w-full h-32 rounded-xl object-cover bg-slate-200" />
-                            <button className="absolute top-2 left-2 p-1.5 bg-white/80 backdrop-blur rounded-full text-slate-400 hover:text-red-500 transition-colors">
-                              <Heart className="w-4 h-4" />
-                            </button>
-                            {seller && (
-                                <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur px-2 py-0.5 rounded text-[10px] text-white flex items-center gap-1">
-                                    <span className="font-bold">{seller.nameAr}</span>
-                                </div>
-                            )}
+            <main className="max-w-7xl mx-auto pt-4">
+              {/* Hero Section */}
+              {!searchTerm && !selectedCategoryId && (
+                  <div className="px-6 mb-8 md:mb-12">
+                      <div className="bg-slate-900 rounded-3xl p-6 md:p-12 text-white relative overflow-hidden shadow-xl min-h-[200px] md:min-h-[300px] flex items-center">
+                          <div className="relative z-10 max-w-lg">
+                              <span className="bg-amber-500 text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded mb-2 inline-block shadow-sm">عروض اليوم</span>
+                              <h2 className="text-2xl md:text-4xl font-bold mb-2 leading-tight">أطباق الأسر المنتجة</h2>
+                              <p className="text-slate-300 text-sm md:text-lg mb-6">طعم البيت الأصيل يوصلك لباب بيتك، بجودة عالية ومكونات طازجة.</p>
+                              <button className="bg-white text-slate-900 px-6 py-2.5 rounded-xl text-sm md:text-base font-bold hover:bg-slate-100 transition-colors shadow-lg">تصفح العروض</button>
                           </div>
-                          <h3 className="font-bold text-slate-800 text-sm mb-1 truncate">{product.nameAr}</h3>
-                          <div className="flex justify-between items-center">
-                            <span className="text-amber-600 font-bold text-sm">{product.price} ر.س</span>
-                            <div className="flex items-center gap-1 text-[10px] text-slate-400">
-                              <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                              <span>{product.rating}</span>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
+                          <img src="https://images.unsplash.com/photo-1547924475-f9e25c02c05e?auto=format&fit=crop&q=80&w=1200" className="absolute top-0 left-0 w-full h-full object-cover opacity-40 mix-blend-overlay" />
+                          <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/80 to-transparent"></div>
+                      </div>
                   </div>
               )}
-            </div>
+
+              {/* Categories */}
+              <div className="px-6 mb-8">
+                <h2 className="text-lg font-bold text-slate-800 mb-4">التصنيفات</h2>
+                <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
+                  {categories.map(cat => (
+                    <button 
+                      key={cat.id} 
+                      onClick={() => {
+                          setSelectedCategoryId(selectedCategoryId === cat.id ? null : cat.id);
+                          triggerHaptic();
+                      }}
+                      className={`flex flex-col items-center gap-3 min-w-[80px] md:min-w-[100px] p-2 rounded-2xl transition-all snap-start ${
+                          selectedCategoryId === cat.id 
+                          ? 'scale-105' 
+                          : 'hover:scale-105'
+                      }`}
+                    >
+                      <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl shadow-sm flex items-center justify-center text-2xl md:text-3xl border transition-colors ${
+                        selectedCategoryId === cat.id 
+                        ? 'bg-amber-100 border-amber-300' 
+                        : 'bg-white border-slate-100 hover:border-amber-200'
+                      }`}>
+                        {cat.icon}
+                      </div>
+                      <span className={`text-xs md:text-sm font-medium ${selectedCategoryId === cat.id ? 'text-amber-700 font-bold' : 'text-slate-600'}`}>{cat.nameAr}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Featured Sellers (Carousel) */}
+              {!selectedCategoryId && !searchTerm && (
+                  <div className="mb-8">
+                      <div className="px-6 mb-4 flex justify-between items-center">
+                          <h2 className="text-lg font-bold text-slate-800">أسر منتجة مميزة</h2>
+                          <button className="text-amber-600 text-sm font-bold hover:underline">عرض الكل</button>
+                      </div>
+                      <div className="flex overflow-x-auto gap-4 px-6 pb-4 snap-x snap-mandatory scrollbar-hide">
+                          {featuredSellers.map(seller => (
+                              <div 
+                                  key={seller.id} 
+                                  onClick={() => navigateToSeller(seller)}
+                                  className="min-w-[280px] md:min-w-[320px] snap-center bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden cursor-pointer active:scale-95 hover:scale-[1.02] transition-all group"
+                              >
+                                  <div className="h-32 md:h-40 relative overflow-hidden">
+                                      <img 
+                                          src={seller.image} 
+                                          alt={seller.nameAr} 
+                                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                                          loading="lazy"
+                                      />
+                                      <div className="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-sm">
+                                          <Clock className="w-3 h-3 text-amber-500" />
+                                          {seller.deliveryTime}
+                                      </div>
+                                  </div>
+                                  <div className="p-4">
+                                      <div className="flex justify-between items-start mb-1">
+                                          <h3 className="font-bold text-slate-800 text-lg">{seller.nameAr}</h3>
+                                          <div className="flex items-center gap-1 bg-amber-50 px-1.5 py-0.5 rounded text-amber-700 font-bold text-xs">
+                                              <span>{seller.rating}</span>
+                                              <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+                                          </div>
+                                      </div>
+                                      <p className="text-xs text-slate-500 mb-3">{seller.cuisine}</p>
+                                      <div className="flex gap-2">
+                                          <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded-full">توصيل مجاني</span>
+                                          <span className="text-[10px] bg-red-50 text-red-600 px-2 py-1 rounded-full">خصم 20%</span>
+                                      </div>
+                                  </div>
+                              </div>
+                          ))}
+                      </div>
+                  </div>
+              )}
+
+              {/* Popular Items - Responsive Grid */}
+              <div className="px-6 mb-12">
+                <h2 className="text-lg font-bold text-slate-800 mb-4">
+                    {selectedCategoryId 
+                      ? `نتائج التصنيف (${displayedProducts.length})` 
+                      : (searchTerm ? `نتائج البحث (${displayedProducts.length})` : 'الأكثر طلباً')
+                    }
+                </h2>
+                
+                {displayedProducts.length === 0 ? (
+                    <div className="text-center py-10 bg-white rounded-2xl border border-dashed border-slate-200">
+                        <p className="text-slate-500">لا توجد منتجات مطابقة للبحث</p>
+                        <button onClick={() => {setSearchTerm(''); setMinPrice(0); setMaxPrice(500); setSelectedCategoryId(null);}} className="text-amber-600 text-sm font-bold mt-2 hover:underline">إزالة الفلاتر</button>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                      {displayedProducts.map(product => {
+                        const seller = sellers.find(s => s.id === product.sellerId);
+                        return (
+                          <div 
+                            key={product.id} 
+                            onClick={() => navigateToProduct(product)}
+                            className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 cursor-pointer active:scale-95 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+                          >
+                            <div className="relative mb-3">
+                              <img src={product.image} alt={product.nameAr} className="w-full h-32 md:h-48 rounded-xl object-cover bg-slate-200" loading="lazy" />
+                              <button className="absolute top-2 left-2 p-1.5 bg-white/80 backdrop-blur rounded-full text-slate-400 hover:text-red-500 transition-colors">
+                                <Heart className="w-4 h-4" />
+                              </button>
+                              {seller && (
+                                  <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur px-2 py-0.5 rounded text-[10px] text-white flex items-center gap-1">
+                                      <span className="font-bold">{seller.nameAr}</span>
+                                  </div>
+                              )}
+                            </div>
+                            <h3 className="font-bold text-slate-800 text-sm md:text-base mb-1 truncate">{product.nameAr}</h3>
+                            <div className="flex justify-between items-center">
+                              <span className="text-amber-600 font-bold text-sm md:text-base">{product.price} ر.س</span>
+                              <div className="flex items-center gap-1 text-[10px] md:text-xs text-slate-400">
+                                <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                                <span>{product.rating}</span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                )}
+              </div>
+            </main>
           </div>
         )}
 
-        {/* Bottom Navigation */}
+        {/* Bottom Navigation (Mobile Only) */}
         {activeView === 'home' && (
             <>
-                <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-between items-center z-20 max-w-md mx-auto">
-                <button onClick={() => { setActiveView('home'); triggerHaptic(); }} className="flex flex-col items-center gap-1 text-slate-800">
-                    <Home className="w-6 h-6" />
-                    <span className="text-[10px] font-bold">الرئيسية</span>
-                </button>
-                <button onClick={() => triggerHaptic()} className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600">
-                    <Heart className="w-6 h-6" />
-                    <span className="text-[10px] font-medium">المفضلة</span>
-                </button>
-                
-                {/* Voice Assistant FAB */}
-                <div className="relative -top-6">
-                    <button 
-                    onClick={() => { setIsVoiceModalOpen(true); triggerHaptic(20); }}
-                    className="w-14 h-14 bg-gradient-to-tr from-amber-500 to-amber-400 rounded-full flex items-center justify-center text-white shadow-lg shadow-amber-500/30 hover:scale-105 active:scale-95 transition-transform"
-                    >
-                    <Mic className="w-7 h-7" />
-                    </button>
-                </div>
+                <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-between items-center z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                  <button onClick={() => { setActiveView('home'); triggerHaptic(); }} className="flex flex-col items-center gap-1 text-amber-600">
+                      <Home className="w-6 h-6 fill-amber-100" />
+                      <span className="text-[10px] font-bold">الرئيسية</span>
+                  </button>
+                  <button onClick={() => triggerHaptic()} className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600">
+                      <Heart className="w-6 h-6" />
+                      <span className="text-[10px] font-medium">المفضلة</span>
+                  </button>
+                  
+                  {/* Voice Assistant FAB */}
+                  <div className="relative -top-6">
+                      <button 
+                      onClick={() => { setIsVoiceModalOpen(true); triggerHaptic(20); }}
+                      className="w-14 h-14 bg-gradient-to-tr from-amber-500 to-amber-400 rounded-full flex items-center justify-center text-white shadow-lg shadow-amber-500/30 hover:scale-105 active:scale-95 transition-transform"
+                      >
+                      <Mic className="w-7 h-7" />
+                      </button>
+                  </div>
 
-                <button onClick={() => triggerHaptic()} className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600">
-                    <Clock className="w-6 h-6" />
-                    <span className="text-[10px] font-medium">طلباتي</span>
-                </button>
-                <button onClick={() => { setActiveView('profile'); triggerHaptic(); }} className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600">
-                    <UserIcon className="w-6 h-6" />
-                    <span className="text-[10px] font-medium">حسابي</span>
-                </button>
+                  <button onClick={() => triggerHaptic()} className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600">
+                      <Clock className="w-6 h-6" />
+                      <span className="text-[10px] font-medium">طلباتي</span>
+                  </button>
+                  <button onClick={() => { setActiveView('profile'); triggerHaptic(); }} className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600">
+                      <UserIcon className="w-6 h-6" />
+                      <span className="text-[10px] font-medium">حسابي</span>
+                  </button>
                 </nav>
+
+                {/* Desktop Floating Mic Button */}
+                <button 
+                   onClick={() => { setIsVoiceModalOpen(true); triggerHaptic(20); }}
+                   className="hidden md:flex fixed bottom-8 left-8 z-40 bg-gradient-to-tr from-amber-500 to-amber-400 text-white p-4 rounded-full shadow-lg shadow-amber-500/30 hover:scale-110 active:scale-95 transition-all items-center gap-2"
+                >
+                    <Mic className="w-6 h-6" />
+                    <span className="font-bold text-sm">مساعد سفرة</span>
+                </button>
 
                 <VoiceAssistantModal 
                 isOpen={isVoiceModalOpen} 
