@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User, UserRole } from '../types';
-import { User as UserIcon, Lock, Phone, Mail, ChevronRight, ShieldCheck } from 'lucide-react';
+import { User as UserIcon, Lock, Phone, Mail, ChevronRight, ShieldCheck, Key } from 'lucide-react';
 
 interface AuthProps {
   onLogin: (user: User) => void;
@@ -58,6 +58,12 @@ export const Auth: React.FC<AuthProps> = ({ onLogin, onRegister, onBack }) => {
     } else {
       onLogin(userData); 
     }
+  };
+
+  const fillAdminCredentials = () => {
+      setIsRegistering(false);
+      setEmail('admin');
+      setPassword('admin');
   };
 
   return (
@@ -178,6 +184,17 @@ export const Auth: React.FC<AuthProps> = ({ onLogin, onRegister, onBack }) => {
             {isRegistering ? 'إنشاء حساب' : 'دخول'}
           </button>
         </form>
+
+        {!isRegistering && (
+            <button 
+                type="button" 
+                onClick={fillAdminCredentials}
+                className="w-full mt-4 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors flex items-center justify-center gap-2 text-sm"
+            >
+                <Key className="w-4 h-4" />
+                دخول تجريبي (مسؤول)
+            </button>
+        )}
 
         <div className="mt-6 text-center">
           <p className="text-slate-500 text-sm">
