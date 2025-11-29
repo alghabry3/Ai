@@ -1,7 +1,5 @@
 {
-  "name": "Sufra - Voice Powered Food Delivery",
-  "description": "A food delivery application featuring a real-time voice assistant powered by Gemini Live API to help users order food and track deliveries.",
-  "requestFramePermissions": [
-    "microphone"
-  ]
+  "name": "Sufra - Food Delivery",
+  "description": "A food delivery application connecting home kitchens with customers.",
+  "requestFramePermissions": []
 }

@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { VoiceAssistantModal } from './components/VoiceAssistantModal';
 import { ProductPage } from './components/ProductPage';
 import { Auth } from './components/Auth';
 import { Cart } from './components/Cart';
@@ -16,7 +15,6 @@ import {
   User as UserIcon, 
   Home, 
   Heart, 
-  Mic,
   Store,
   FilterX,
   SlidersHorizontal,
@@ -224,7 +222,6 @@ export const App: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedSeller, setSelectedSeller] = useState<Seller | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
 
@@ -835,16 +832,6 @@ export const App: React.FC = () => {
                  <span className={`text-[10px] font-bold ${activeView === 'favorites' ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'}`}>المفضلة</span>
              </button>
              
-             {/* Voice Assistant FAB */}
-             <div className="relative -top-6">
-                 <button 
-                 onClick={() => { setIsVoiceModalOpen(true); triggerHaptic(20); }}
-                 className="w-14 h-14 bg-slate-900 rounded-full flex items-center justify-center text-white shadow-lg shadow-slate-900/40 hover:scale-105 active:scale-95 transition-transform border-4 border-slate-50"
-                 >
-                 <Mic className="w-6 h-6" />
-                 </button>
-             </div>
-
              <button onClick={navigateToProfile} className={`flex flex-col items-center gap-1 transition-all ${activeView === 'profile' ? 'text-amber-600 -translate-y-1' : 'text-slate-400 hover:text-slate-600'}`}>
                  <Clock className={`w-6 h-6 ${activeView === 'profile' ? 'fill-amber-100' : ''}`} />
                  <span className={`text-[10px] font-bold ${activeView === 'profile' ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'}`}>طلباتي</span>
@@ -856,19 +843,6 @@ export const App: React.FC = () => {
            </nav>
         ) : null}
 
-        {/* Desktop Floating Mic Button */}
-        <button 
-            onClick={() => { setIsVoiceModalOpen(true); triggerHaptic(20); }}
-            className="hidden md:flex fixed bottom-8 left-8 z-40 bg-slate-900 text-white p-4 rounded-full shadow-lg shadow-slate-900/30 hover:scale-110 active:scale-95 transition-all items-center gap-2"
-        >
-            <Mic className="w-6 h-6" />
-            <span className="font-bold text-sm">مساعد سفرة</span>
-        </button>
-
-        <VoiceAssistantModal 
-        isOpen={isVoiceModalOpen} 
-        onClose={() => setIsVoiceModalOpen(false)} 
-        />
       </div>
     </>
   );
