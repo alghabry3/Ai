@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Seller, Product } from '../types';
-import { ArrowRight, Star, Clock, MapPin, Heart, Store } from 'lucide-react';
+import { ArrowRight, Star, Clock, MapPin, Heart, Store, Phone, Mail } from 'lucide-react';
 
 interface SellerPageProps {
   seller: Seller;
@@ -88,6 +88,42 @@ export const SellerPage: React.FC<SellerPageProps> = ({
                 <Store className="w-5 h-5 text-slate-400" />
                 <span className="text-xs text-slate-500">الحد الأدنى</span>
                 <span className="font-bold text-slate-800 text-sm">50 ر.س</span>
+            </div>
+        </div>
+
+        {/* Contact Info Section */}
+        <div className="px-4 mt-4 md:px-0 md:mt-6">
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                <h3 className="font-bold text-slate-800 mb-3 text-sm md:text-base">معلومات التواصل</h3>
+                <div className="flex flex-col gap-3">
+                     {seller.phone && (
+                         <div className="flex items-center gap-3 text-sm text-slate-600">
+                             <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                                 <Phone className="w-4 h-4" />
+                             </div>
+                             <span dir="ltr">{seller.phone}</span>
+                         </div>
+                     )}
+                     {seller.email && (
+                         <div className="flex items-center gap-3 text-sm text-slate-600">
+                             <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                                 <Mail className="w-4 h-4" />
+                             </div>
+                             <span>{seller.email}</span>
+                         </div>
+                     )}
+                     {seller.address && (
+                         <div className="flex items-center gap-3 text-sm text-slate-600">
+                             <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                                 <MapPin className="w-4 h-4" />
+                             </div>
+                             <span>{seller.address}</span>
+                         </div>
+                     )}
+                     {!seller.phone && !seller.email && !seller.address && (
+                         <p className="text-slate-400 text-sm">لا تتوفر معلومات تواصل إضافية</p>
+                     )}
+                </div>
             </div>
         </div>
 

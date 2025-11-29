@@ -20,82 +20,116 @@ import {
   Store,
   FilterX,
   SlidersHorizontal,
-  ArrowRight
+  ArrowRight,
+  Bell,
+  ChevronDown,
+  Bike,
+  Percent,
+  Flame,
+  Plus
 } from 'lucide-react';
 import { Product, Category, Seller, User, CartItem, Order, UserRole, Transaction } from './types';
 
 // --- MOCK INITIAL DATA (PRODUCTIVE FAMILIES THEME) ---
 
 const INITIAL_CATEGORIES: Category[] = [
-  { id: 'cat1', nameAr: 'أطباق شعبية', icon: '🥘' },
-  { id: 'cat2', nameAr: 'حلويات ومعجنات', icon: '🧁' },
+  { id: 'cat1', nameAr: 'شعبيات', icon: '🥘' },
+  { id: 'cat2', nameAr: 'حلى وقهوة', icon: '🧁' },
   { id: 'cat3', nameAr: 'مفرزنات', icon: '❄️' },
-  { id: 'cat4', nameAr: 'بهارات وقهوة', icon: '☕' },
-  { id: 'cat5', nameAr: 'أكل صحي', icon: '🥗' },
+  { id: 'cat4', nameAr: 'محاشي', icon: '🍇' },
+  { id: 'cat5', nameAr: 'صحي', icon: '🥗' },
+  { id: 'cat6', nameAr: 'مخبوزات', icon: '🥐' },
+];
+
+const PROMO_BANNERS = [
+    {
+        id: 1,
+        title: 'عروض الغداء!',
+        subtitle: 'خصم ٥٠٪ على أول طلب لك',
+        color: 'from-orange-500 to-amber-600',
+        image: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&q=80&w=800' // Arabic Feast
+    },
+    {
+        id: 2,
+        title: 'توصيل مجاني',
+        subtitle: 'على جميع طلبات الأسر المنتجة',
+        color: 'from-emerald-600 to-teal-500',
+        image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=800' // Shopping/Food
+    }
 ];
 
 const INITIAL_SELLERS: Seller[] = [
   { 
     id: 's1', 
     nameAr: 'مطبخ أم عبد الله', 
-    cuisine: 'أكلات سعودية أصيلة', 
-    deliveryTime: '60-90 دقيقة', 
+    cuisine: 'أكلات سعودية • جريش • قرصان', 
+    deliveryTime: '45 - 55 دقيقة', 
     rating: 4.9, 
-    image: 'https://images.unsplash.com/photo-1547924475-f9e25c02c05e?auto=format&fit=crop&q=80&w=800' 
+    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=800', // Saudi Rice/Jareesh style
+    phone: '0501234567',
+    email: 'um.abdullah@example.com',
+    address: 'الرياض، حي الملقا، شارع الأبراج'
   },
   { 
     id: 's2', 
     nameAr: 'حلويات شهد المنزلية', 
-    cuisine: 'كيك وحلويات شرقية', 
-    deliveryTime: '45-60 دقيقة', 
+    cuisine: 'كيك • تشيز كيك • حلى قهوة', 
+    deliveryTime: '30 - 45 دقيقة', 
     rating: 4.7, 
-    image: 'https://images.unsplash.com/photo-1579372786545-d24232daf58c?auto=format&fit=crop&q=80&w=800' 
+    image: 'https://images.unsplash.com/photo-1579372786545-d24232daf58c?auto=format&fit=crop&q=80&w=800', // Cake
+    phone: '0559876543',
+    address: 'الرياض، حي الصحافة' 
   },
   { 
     id: 's3', 
     nameAr: 'تجهيزات أم ريان', 
-    cuisine: 'مفرزنات وسمبوسة', 
+    cuisine: 'مفرزنات رمضان • سمبوسة', 
     deliveryTime: 'يوم عمل', 
     rating: 4.8, 
-    image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&q=80&w=800' 
+    image: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&q=80&w=800', // Samosa/Fried
+    phone: '0543210987'
   },
   { 
     id: 's4', 
     nameAr: 'نكهات صحية (دايت)', 
-    cuisine: 'وجبات صحية وكيتو', 
-    deliveryTime: '30-45 دقيقة', 
+    cuisine: 'كيتو • لو كارب • سلطات', 
+    deliveryTime: '30 - 40 دقيقة', 
     rating: 4.6, 
-    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=800' 
+    image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=80&w=800', // Healthy Salad
+    email: 'info@healthyflavors.sa',
+    address: 'الرياض، حي الياسمين'
   },
   {
     id: 's5',
     nameAr: 'مطبخ الشام',
-    cuisine: 'ورق عنب ومحاشي',
+    cuisine: 'ورق عنب • ملفوف • كبة',
     deliveryTime: '60 دقيقة',
     rating: 4.9,
-    image: 'https://images.unsplash.com/photo-1559381552-01994354c0e6?auto=format&fit=crop&q=80&w=800'
+    image: 'https://images.unsplash.com/photo-1544681280-d3dc351a94ce?auto=format&fit=crop&q=80&w=800', // Middle Eastern Table
+    phone: '0567890123'
   },
   {
     id: 's6',
     nameAr: 'قهوة وحلا',
-    cuisine: 'قهوة مختصة وحلى منزلي',
-    deliveryTime: '20-30 دقيقة',
+    cuisine: 'قهوة مختصة • كوكيز • تارت',
+    deliveryTime: '20 - 30 دقيقة',
     rating: 4.5,
-    image: 'https://images.unsplash.com/photo-1599785209796-786432b228bc?auto=format&fit=crop&q=80&w=800'
+    image: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80&w=800', // Coffee & Cookies
+    address: 'الرياض، البوليڤارد'
   }
 ];
 
 const INITIAL_PRODUCTS: Product[] = [
-  // Seller 1: Um Abdullah
+  // Seller 1: Um Abdullah (Saudi/Jareesh)
   { 
     id: 'p1', 
     nameAr: 'جريش أحمر باللحم', 
     descriptionAr: 'جريش نجد الأصلي باللحم البلدي والمسمنة', 
     price: 45, 
-    image: 'https://images.unsplash.com/photo-1547924475-f9e25c02c05e?auto=format&fit=crop&q=80&w=800', 
+    image: 'https://images.unsplash.com/photo-1542528180-a1208c5169a5?auto=format&fit=crop&q=80&w=800', // Porridge/Jareesh style
     images: [
-      'https://images.unsplash.com/photo-1547924475-f9e25c02c05e?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=800'
+      'https://images.unsplash.com/photo-1542528180-a1208c5169a5?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1626804475297-411d8c669143?auto=format&fit=crop&q=80&w=800'
     ],
     rating: 4.9,
     longDescriptionAr: 'وجبة الجريش النجدي الأحمر الفاخر، مطبوخ بعناية فائقة لمدة ٦ ساعات مع اللحم النعيمي الطازج. يقدم مع "المسمنة" الخاصة المكونة من البصل والليمون الأسود والبهارات النجدية. وجبة تكفي شخصين.',
@@ -104,31 +138,33 @@ const INITIAL_PRODUCTS: Product[] = [
     sellerId: 's1',
     categoryId: 'cat1'
   },
+  // Seller 5: Sham (Vine Leaves)
   { 
     id: 'p2', 
     nameAr: 'ورق عنب بدبس الرمان', 
     descriptionAr: 'بوكس ٢٠ حبة، حشوة الرز المصري والخضار', 
     price: 35, 
-    image: 'https://images.unsplash.com/photo-1559381552-01994354c0e6?auto=format&fit=crop&q=80&w=800', 
+    image: 'https://images.unsplash.com/photo-1606419266184-722122d64098?auto=format&fit=crop&q=80&w=800', // Dolma/Vine Leaves
     images: [
-      'https://images.unsplash.com/photo-1559381552-01994354c0e6?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1606509923238-769165d4486b?auto=format&fit=crop&q=80&w=800'
+      'https://images.unsplash.com/photo-1606419266184-722122d64098?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1559381552-01994354c0e6?auto=format&fit=crop&q=80&w=800'
     ],
     rating: 4.8,
     longDescriptionAr: 'ورق عنب طازج ومحشي يدوياً بخلطة الأرز المصري والخضروات الورقية الطازجة، مطبوخ بدبس الرمان وزيت الزيتون البكر. طعم حامض وحلو موزون بعناية.',
     ingredientsAr: ['ورق عنب', 'أرز مصري', 'بقدونس', 'طماطم', 'دبس رمان', 'زيت زيتون', 'ليمون'],
     nutrition: { calories: 180, protein: '4g', carbs: '32g', fats: '6g' },
     sellerId: 's5',
-    categoryId: 'cat1'
+    categoryId: 'cat4'
   },
+  // Seller 2: Shahd (Cheesecake)
   { 
     id: 'p3', 
     nameAr: 'تشيز كيك اللوتس', 
     descriptionAr: 'قطعة تشيز كيك غنية بطبقة لوتس مقرمشة', 
     price: 22, 
-    image: 'https://images.unsplash.com/photo-1579372786545-d24232daf58c?auto=format&fit=crop&q=80&w=800', 
+    image: 'https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=80&w=800', // Cheesecake
     images: [
-      'https://images.unsplash.com/photo-1579372786545-d24232daf58c?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=80&w=800',
       'https://images.unsplash.com/photo-1521305916504-4a1121188589?auto=format&fit=crop&q=80&w=800'
     ],
     rating: 4.7,
@@ -138,12 +174,13 @@ const INITIAL_PRODUCTS: Product[] = [
     sellerId: 's2',
     categoryId: 'cat2'
   },
+  // Seller 3: Umm Rayan (Samosa)
   {
     id: 'p4',
     nameAr: 'سمبوسة لحم (مفرزنة)', 
     descriptionAr: 'علبة ٥٠ حبة، عجينة منزلية وحشوة لحم غنم',
     price: 85,
-    image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&q=80&w=800', // Samosa
     rating: 4.9,
     longDescriptionAr: 'سمبوسة مجهزة للتفريز، مصنوعة من عجينة منزلية رقيقة ومقرمشة. الحشوة غنية بلحم الغنم الطازج مع البصل والبهارات الخاصة. جاهزة للقلي المباشر.',
     ingredientsAr: ['دقيق', 'لحم غنم مفروم', 'بصل', 'بقدونس', 'بهارات خاصة', 'ملح'],
@@ -151,12 +188,13 @@ const INITIAL_PRODUCTS: Product[] = [
     sellerId: 's3',
     categoryId: 'cat3'
   },
+  // Seller 4: Healthy (Kabsa)
   {
     id: 'p5',
     nameAr: 'كبسة دجاج (صحي)',
     descriptionAr: 'كبسة بصدر دجاج مشوي وأرز بني، قليلة الدهون',
     price: 38,
-    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-1505253758473-96b701d36dec?auto=format&fit=crop&q=80&w=800', // Chicken Rice Bowl
     rating: 4.5,
     longDescriptionAr: 'نسخة صحية من الكبسة السعودية التقليدية. نستخدم الأرز البني الكامل وصدور الدجاج المشوية بدون جلد، مع تقليل كمية الدهون والملح. خيار مثالي للرياضيين ومتبعي الحميات.',
     ingredientsAr: ['أرز بني', 'صدر دجاج', 'جزر', 'فلفل رومي', 'بهارات كبسة', 'زيت زيتون (قليل)'],
@@ -164,12 +202,13 @@ const INITIAL_PRODUCTS: Product[] = [
     sellerId: 's4',
     categoryId: 'cat5'
   },
+  // Seller 6: Cookies
   {
     id: 'p6',
     nameAr: 'كوكيز كلاسيك',
     descriptionAr: 'بوكس ١٢ حبة، محشو بقطع الشوكولاتة البلجيكية',
     price: 65,
-    image: 'https://images.unsplash.com/photo-1599785209796-786432b228bc?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-1499636138143-bd63e731880e?auto=format&fit=crop&q=80&w=800', // Chocolate Chip Cookies
     rating: 4.8,
     longDescriptionAr: 'كوكيز طري وهش، مخبوز يومياً باستخدام الزبدة الفاخرة وقطع الشوكولاتة البلجيكية الحقيقية. يذوب في الفم مع كل قضمة.',
     ingredientsAr: ['دقيق', 'زبدة', 'شوكولاتة بلجيكية', 'سكر بني', 'بيض', 'فانيليا'],
@@ -202,6 +241,7 @@ export const App: React.FC = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'fast' | 'offers' | 'rated'>('all');
   const [minPrice, setMinPrice] = useState<number>(0);
   const [maxPrice, setMaxPrice] = useState<number>(500);
 
@@ -317,12 +357,23 @@ export const App: React.FC = () => {
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
   };
 
+  // Image Fallback Handler
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    e.currentTarget.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=800"; // Generic food fallback
+  };
+
   // Filter Logic
   const displayedProducts = products.filter(p => {
     const matchesCategory = selectedCategoryId ? p.categoryId === selectedCategoryId : true;
     const matchesSearch = p.nameAr.includes(searchTerm) || p.descriptionAr.includes(searchTerm);
     const matchesPrice = p.price >= minPrice && p.price <= maxPrice;
-    return matchesCategory && matchesSearch && matchesPrice;
+    
+    // Quick Filters
+    let matchesQuickFilter = true;
+    if (activeFilter === 'rated') matchesQuickFilter = p.rating >= 4.8;
+    // Assuming 'offers' and 'fast' would need real data, using placeholders
+    
+    return matchesCategory && matchesSearch && matchesPrice && matchesQuickFilter;
   });
 
   const featuredSellers = sellers.slice(0, 5);
@@ -435,7 +486,12 @@ export const App: React.FC = () => {
                                         className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 cursor-pointer active:scale-95 transition-all"
                                     >
                                         <div className="relative mb-3">
-                                            <img src={product.image} alt={product.nameAr} className="w-full h-32 md:h-48 rounded-xl object-cover bg-slate-200" />
+                                            <img 
+                                              src={product.image} 
+                                              alt={product.nameAr} 
+                                              className="w-full h-32 md:h-48 rounded-xl object-cover bg-slate-200"
+                                              onError={handleImageError} 
+                                            />
                                             <button 
                                                 onClick={(e) => toggleFavorite(product.id, e)}
                                                 className="absolute top-2 left-2 p-1.5 bg-white/80 backdrop-blur rounded-full text-red-500 hover:bg-white"
@@ -459,43 +515,44 @@ export const App: React.FC = () => {
 
         {activeView === 'home' && (
           <div className="pb-24 animate-in fade-in">
-            {/* Header */}
-            <header className="bg-white p-4 sticky top-0 z-20 shadow-sm">
-              <div className="max-w-7xl mx-auto">
+            {/* --- Professional Header (Top Sticky) --- */}
+            <header className="bg-white pt-4 pb-2 sticky top-0 z-30 shadow-sm border-b border-slate-50">
+              <div className="max-w-7xl mx-auto px-4 md:px-6">
+                
+                {/* Location & User Actions */}
                 <div className="flex justify-between items-center mb-4">
-                  <div className="flex items-center gap-8">
-                    <div>
-                      <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                        <span className="bg-amber-500 text-white p-1 rounded-lg">س</span>
-                        سفرة
-                      </h1>
-                      <div className="flex items-center gap-1 text-xs text-slate-500 mt-1">
-                        <MapPin className="w-3 h-3" />
-                        <span>الرياض، السعودية</span>
-                      </div>
+                  
+                  {/* Location Selector (Center/Left Styled) */}
+                  <div className="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-xl transition-colors">
+                    <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center text-amber-600">
+                        <MapPin className="w-5 h-5 fill-amber-500/20" />
                     </div>
-                    {/* Desktop Navigation */}
-                    <nav className="hidden md:flex gap-6 text-sm font-medium text-slate-600">
-                        <button onClick={() => { setActiveView('home'); triggerHaptic(); }} className={`transition-colors ${activeView === 'home' ? 'text-amber-600 font-bold' : 'hover:text-amber-600'}`}>الرئيسية</button>
-                        <button onClick={navigateToProfile} className="hover:text-amber-600 transition-colors">طلباتي</button>
-                        <button onClick={() => { setActiveView('favorites'); triggerHaptic(); }} className="hover:text-amber-600 transition-colors">المفضلة</button>
-                    </nav>
+                    <div className="flex flex-col">
+                        <span className="text-[10px] text-slate-400 font-bold">التوصيل إلى</span>
+                        <div className="flex items-center gap-1 text-slate-800 font-bold text-sm">
+                            <span>المنزل، الرياض</span>
+                            <ChevronDown className="w-4 h-4 text-amber-500" />
+                        </div>
+                    </div>
                   </div>
 
-                  <div className="flex gap-2">
-                      {user ? (
-                          <button onClick={navigateToProfile} className="p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors">
-                              <UserIcon className="w-5 h-5 text-slate-600" />
-                          </button>
-                      ) : (
-                          <button onClick={() => setActiveView('auth')} className="px-4 py-2 bg-slate-900 text-white rounded-full text-xs font-bold hover:bg-slate-800 transition-colors">
-                              دخول
-                          </button>
-                      )}
-                      <button onClick={() => setActiveView('cart')} className="p-2 bg-slate-100 rounded-full relative hover:bg-slate-200 transition-colors">
-                          <ShoppingBag className="w-5 h-5 text-slate-600" />
+                  {/* Desktop Nav Links */}
+                  <nav className="hidden md:flex gap-8 text-sm font-medium text-slate-600">
+                      <button onClick={() => { setActiveView('home'); triggerHaptic(); }} className={`transition-colors ${activeView === 'home' ? 'text-amber-600 font-bold' : 'hover:text-amber-600'}`}>الرئيسية</button>
+                      <button onClick={navigateToProfile} className="hover:text-amber-600 transition-colors">طلباتي</button>
+                      <button onClick={() => { setActiveView('favorites'); triggerHaptic(); }} className="hover:text-amber-600 transition-colors">المفضلة</button>
+                  </nav>
+
+                  {/* Actions (Notif, Cart, Profile) */}
+                  <div className="flex items-center gap-3">
+                      <button className="p-2.5 rounded-full hover:bg-slate-100 text-slate-600 relative transition-colors">
+                          <Bell className="w-6 h-6" />
+                          <span className="absolute top-2 right-2.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                      </button>
+                      <button onClick={() => setActiveView('cart')} className="p-2.5 rounded-full hover:bg-slate-100 text-slate-600 relative transition-colors">
+                          <ShoppingBag className="w-6 h-6" />
                           {cart.length > 0 && (
-                          <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-white text-[10px] flex items-center justify-center rounded-full font-bold">
+                          <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-amber-500 text-white text-[10px] flex items-center justify-center rounded-full font-bold shadow-sm">
                               {cart.length}
                           </span>
                           )}
@@ -503,73 +560,86 @@ export const App: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Search Bar */}
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Search className="absolute right-3 top-3 w-5 h-5 text-slate-400" />
+                {/* Search & Filter Bar */}
+                <div className="flex gap-3 pb-2">
+                  <div className="relative flex-1 group">
+                    <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-amber-500 transition-colors" />
                     <input 
                       type="text" 
-                      placeholder="ابحث عن وجبتك المفضلة..." 
+                      placeholder="ابحث عن مطعم أو وجبة..." 
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-10 text-right focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm transition-all"
+                      className="w-full bg-slate-100/80 border-none rounded-2xl py-3.5 px-12 text-sm text-slate-800 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:shadow-md transition-all shadow-inner"
                     />
                   </div>
                   <button 
                     onClick={() => { setShowFilters(!showFilters); triggerHaptic(); }}
-                    className={`p-3 rounded-xl border transition-all ${showFilters ? 'bg-amber-50 border-amber-200 text-amber-600' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+                    className={`p-3.5 rounded-2xl border transition-all shadow-sm ${showFilters ? 'bg-amber-500 text-white border-amber-600 shadow-amber-500/30' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
                   >
                     <SlidersHorizontal className="w-5 h-5" />
                   </button>
                 </div>
 
-                {/* Advanced Filters Panel */}
-                {showFilters && (
-                  <div className="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-100 animate-in slide-in-from-top-2">
-                    <div className="flex justify-between items-center mb-3">
-                        <h3 className="font-bold text-slate-700 text-sm">تصفية حسب السعر</h3>
-                        <button onClick={() => { setMinPrice(0); setMaxPrice(500); setSelectedCategoryId(null); }} className="text-xs text-red-500 flex items-center gap-1 hover:underline">
-                          <FilterX className="w-3 h-3" /> مسح الكل
+                {/* Filter Chips (Scrollable) */}
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide pt-2">
+                    {[
+                        { id: 'all', label: 'الكل', icon: null },
+                        { id: 'fast', label: 'توصيل سريع', icon: <Bike className="w-3 h-3"/> },
+                        { id: 'offers', label: 'عروض حصرية', icon: <Percent className="w-3 h-3"/> },
+                        { id: 'rated', label: 'الأعلى تقييماً', icon: <Star className="w-3 h-3"/> },
+                    ].map(f => (
+                        <button
+                            key={f.id}
+                            onClick={() => setActiveFilter(f.id as any)}
+                            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
+                                activeFilter === f.id 
+                                ? 'bg-amber-600 text-white shadow-md shadow-amber-500/20' 
+                                : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                            }`}
+                        >
+                            {f.icon}
+                            {f.label}
                         </button>
-                    </div>
-                    <div className="flex items-center gap-4 text-sm text-slate-600">
-                        <span>{minPrice} ر.س</span>
-                        <input 
-                          type="range" 
-                          min="0" 
-                          max="500" 
-                          value={maxPrice} 
-                          onChange={(e) => setMaxPrice(Number(e.target.value))}
-                          className="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500" 
-                        />
-                        <span>{maxPrice} ر.س</span>
-                    </div>
-                  </div>
-                )}
+                    ))}
+                </div>
+
               </div>
             </header>
 
-            <main className="max-w-7xl mx-auto pt-4">
-              {/* Hero Section */}
+            <main className="max-w-7xl mx-auto pt-6 px-4 md:px-6 space-y-8">
+              
+              {/* Promo Carousel (Hero) */}
               {!searchTerm && !selectedCategoryId && (
-                  <div className="px-6 mb-8 md:mb-12">
-                      <div className="bg-slate-900 rounded-3xl p-6 md:p-12 text-white relative overflow-hidden shadow-xl min-h-[200px] md:min-h-[300px] flex items-center">
-                          <div className="relative z-10 max-w-lg">
-                              <span className="bg-amber-500 text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded mb-2 inline-block shadow-sm">عروض اليوم</span>
-                              <h2 className="text-2xl md:text-4xl font-bold mb-2 leading-tight">أطباق الأسر المنتجة</h2>
-                              <p className="text-slate-300 text-sm md:text-lg mb-6">طعم البيت الأصيل يوصلك لباب بيتك، بجودة عالية ومكونات طازجة.</p>
-                              <button className="bg-white text-slate-900 px-6 py-2.5 rounded-xl text-sm md:text-base font-bold hover:bg-slate-100 transition-colors shadow-lg">تصفح العروض</button>
-                          </div>
-                          <img src="https://images.unsplash.com/photo-1547924475-f9e25c02c05e?auto=format&fit=crop&q=80&w=1200" className="absolute top-0 left-0 w-full h-full object-cover opacity-40 mix-blend-overlay" />
-                          <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/80 to-transparent"></div>
+                  <div className="relative overflow-hidden rounded-3xl h-48 md:h-[350px] shadow-lg group">
+                      <div className="flex h-full transition-transform duration-500 ease-out" style={{ transform: `translateX(0%)` }}> 
+                         {/* Simplified single slide for demo, ideally map PROMO_BANNERS */}
+                         <div className="min-w-full h-full relative">
+                             <img 
+                               src={PROMO_BANNERS[0].image} 
+                               className="absolute inset-0 w-full h-full object-cover" 
+                               alt="promo" 
+                               onError={handleImageError}
+                             />
+                             <div className={`absolute inset-0 bg-gradient-to-r ${PROMO_BANNERS[0].color} opacity-80 mix-blend-multiply`}></div>
+                             <div className="absolute inset-0 p-8 flex flex-col justify-center items-start text-white">
+                                 <span className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-lg text-xs font-bold mb-3 border border-white/10">عرض خاص</span>
+                                 <h2 className="text-3xl md:text-5xl font-bold mb-2">{PROMO_BANNERS[0].title}</h2>
+                                 <p className="text-lg opacity-90 mb-6">{PROMO_BANNERS[0].subtitle}</p>
+                                 <button className="bg-white text-amber-600 px-6 py-3 rounded-xl font-bold text-sm hover:scale-105 transition-transform shadow-xl">
+                                     اطلب الآن
+                                 </button>
+                             </div>
+                         </div>
                       </div>
                   </div>
               )}
 
-              {/* Categories */}
-              <div className="px-6 mb-8">
-                <h2 className="text-lg font-bold text-slate-800 mb-4">التصنيفات</h2>
-                <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
+              {/* Categories Circles */}
+              <div>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-bold text-slate-800">ماذا تشتهي اليوم؟</h2>
+                </div>
+                <div className="flex gap-4 md:gap-8 overflow-x-auto pb-4 scrollbar-hide snap-x">
                   {categories.map(cat => (
                     <button 
                       key={cat.id} 
@@ -577,63 +647,94 @@ export const App: React.FC = () => {
                           setSelectedCategoryId(selectedCategoryId === cat.id ? null : cat.id);
                           triggerHaptic();
                       }}
-                      className={`flex flex-col items-center gap-3 min-w-[80px] md:min-w-[100px] p-2 rounded-2xl transition-all snap-start ${
-                          selectedCategoryId === cat.id 
-                          ? 'scale-105' 
-                          : 'hover:scale-105'
-                      }`}
+                      className="flex flex-col items-center gap-2 min-w-[72px] snap-start group"
                     >
-                      <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl shadow-sm flex items-center justify-center text-2xl md:text-3xl border transition-colors ${
+                      <div className={`w-18 h-18 md:w-20 md:h-20 rounded-2xl md:rounded-full flex items-center justify-center text-3xl transition-all duration-300 shadow-sm ${
                         selectedCategoryId === cat.id 
-                        ? 'bg-amber-100 border-amber-300' 
-                        : 'bg-white border-slate-100 hover:border-amber-200'
+                        ? 'bg-amber-500 text-white shadow-amber-500/40 scale-110' 
+                        : 'bg-white text-slate-700 hover:bg-amber-50'
                       }`}>
                         {cat.icon}
                       </div>
-                      <span className={`text-xs md:text-sm font-medium ${selectedCategoryId === cat.id ? 'text-amber-700 font-bold' : 'text-slate-600'}`}>{cat.nameAr}</span>
+                      <span className={`text-xs font-bold transition-colors ${selectedCategoryId === cat.id ? 'text-amber-600' : 'text-slate-600 group-hover:text-slate-800'}`}>
+                          {cat.nameAr}
+                      </span>
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Featured Sellers (Carousel) */}
+              {/* Featured Sellers (Pro Cards) */}
               {!selectedCategoryId && !searchTerm && (
-                  <div className="mb-8">
-                      <div className="px-6 mb-4 flex justify-between items-center">
-                          <h2 className="text-lg font-bold text-slate-800">أسر منتجة مميزة</h2>
+                  <div>
+                      <div className="flex justify-between items-center mb-4">
+                          <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                              <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+                              أسر منتجة مميزة
+                          </h2>
                           <button className="text-amber-600 text-sm font-bold hover:underline">عرض الكل</button>
                       </div>
-                      <div className="flex overflow-x-auto gap-4 px-6 pb-4 snap-x snap-mandatory scrollbar-hide">
+                      
+                      <div className="flex overflow-x-auto gap-4 pb-8 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
                           {featuredSellers.map(seller => (
                               <div 
                                   key={seller.id} 
                                   onClick={() => navigateToSeller(seller)}
-                                  className="min-w-[280px] md:min-w-[320px] snap-center bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden cursor-pointer active:scale-95 hover:scale-[1.02] transition-all group"
+                                  className="min-w-[280px] md:min-w-[340px] snap-center bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group"
                               >
-                                  <div className="h-32 md:h-40 relative overflow-hidden">
+                                  {/* Card Header Image */}
+                                  <div className="h-40 relative">
                                       <img 
                                           src={seller.image} 
                                           alt={seller.nameAr} 
-                                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                                          className="w-full h-full object-cover" 
                                           loading="lazy"
+                                          onError={handleImageError}
                                       />
-                                      <div className="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-sm">
-                                          <Clock className="w-3 h-3 text-amber-500" />
+                                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
+                                      
+                                      {/* Floating Delivery Badge */}
+                                      <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-sm text-slate-800">
+                                          <Clock className="w-3 h-3 text-emerald-500" />
                                           {seller.deliveryTime}
                                       </div>
+                                      
+                                      {/* Favorite Button */}
+                                      <button className="absolute top-3 left-3 p-2 bg-black/20 backdrop-blur-md rounded-full text-white hover:bg-white hover:text-red-500 transition-colors">
+                                          <Heart className="w-4 h-4" />
+                                      </button>
                                   </div>
-                                  <div className="p-4">
-                                      <div className="flex justify-between items-start mb-1">
-                                          <h3 className="font-bold text-slate-800 text-lg">{seller.nameAr}</h3>
-                                          <div className="flex items-center gap-1 bg-amber-50 px-1.5 py-0.5 rounded text-amber-700 font-bold text-xs">
-                                              <span>{seller.rating}</span>
-                                              <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
-                                          </div>
+
+                                  {/* Card Body */}
+                                  <div className="p-4 relative">
+                                      {/* Seller Logo Floating */}
+                                      <div className="absolute -top-8 right-4 w-14 h-14 bg-white rounded-xl shadow-lg flex items-center justify-center p-1 border-2 border-white">
+                                          <img 
+                                            src={seller.image} 
+                                            className="w-full h-full object-cover rounded-lg" 
+                                            alt="logo" 
+                                            onError={handleImageError}
+                                          />
                                       </div>
-                                      <p className="text-xs text-slate-500 mb-3">{seller.cuisine}</p>
-                                      <div className="flex gap-2">
-                                          <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded-full">توصيل مجاني</span>
-                                          <span className="text-[10px] bg-red-50 text-red-600 px-2 py-1 rounded-full">خصم 20%</span>
+
+                                      <div className="mt-4">
+                                          <h3 className="font-bold text-slate-900 text-lg mb-0.5">{seller.nameAr}</h3>
+                                          <p className="text-xs text-slate-500 mb-3">{seller.cuisine}</p>
+                                          
+                                          <div className="flex items-center gap-3 text-xs border-t border-slate-50 pt-3">
+                                              <div className="flex items-center gap-1 text-slate-700 font-bold">
+                                                  <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                                                  {seller.rating}
+                                              </div>
+                                              <div className="w-1 h-1 bg-slate-300 rounded-full"></div>
+                                              <div className="flex items-center gap-1 text-slate-500">
+                                                  <Bike className="w-3.5 h-3.5" />
+                                                  <span>١٥ ر.س</span>
+                                              </div>
+                                              <div className="ml-auto bg-amber-50 text-amber-700 px-2 py-0.5 rounded-md font-bold text-[10px]">
+                                                  أسر منتجة
+                                              </div>
+                                          </div>
                                       </div>
                                   </div>
                               </div>
@@ -642,22 +743,25 @@ export const App: React.FC = () => {
                   </div>
               )}
 
-              {/* Popular Items - Responsive Grid */}
-              <div className="px-6 mb-12">
-                <h2 className="text-lg font-bold text-slate-800 mb-4">
-                    {selectedCategoryId 
-                      ? `نتائج التصنيف (${displayedProducts.length})` 
-                      : (searchTerm ? `نتائج البحث (${displayedProducts.length})` : 'الأكثر طلباً')
-                    }
-                </h2>
+              {/* Recommended Products (Grid) */}
+              <div className="pb-8">
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-bold text-slate-800">
+                        {selectedCategoryId 
+                        ? `نتائج التصنيف (${displayedProducts.length})` 
+                        : (searchTerm ? `نتائج البحث (${displayedProducts.length})` : 'مقترحة لك')
+                        }
+                    </h2>
+                </div>
                 
                 {displayedProducts.length === 0 ? (
-                    <div className="text-center py-10 bg-white rounded-2xl border border-dashed border-slate-200">
+                    <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-slate-200">
+                        <ShoppingBag className="w-12 h-12 text-slate-200 mx-auto mb-3" />
                         <p className="text-slate-500">لا توجد منتجات مطابقة للبحث</p>
                         <button onClick={() => {setSearchTerm(''); setMinPrice(0); setMaxPrice(500); setSelectedCategoryId(null);}} className="text-amber-600 text-sm font-bold mt-2 hover:underline">إزالة الفلاتر</button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                       {displayedProducts.map(product => {
                         const seller = sellers.find(s => s.id === product.sellerId);
                         const isFav = favorites.has(product.id);
@@ -665,29 +769,49 @@ export const App: React.FC = () => {
                           <div 
                             key={product.id} 
                             onClick={() => navigateToProduct(product)}
-                            className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 cursor-pointer active:scale-95 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+                            className="bg-white p-3 rounded-[1.5rem] shadow-sm border border-slate-100 cursor-pointer active:scale-[0.98] hover:shadow-lg transition-all duration-300 group flex sm:block gap-4 items-center sm:items-stretch h-32 sm:h-auto"
                           >
-                            <div className="relative mb-3">
-                              <img src={product.image} alt={product.nameAr} className="w-full h-32 md:h-48 rounded-xl object-cover bg-slate-200" loading="lazy" />
+                            {/* Product Image */}
+                            <div className="relative w-28 h-28 sm:w-full sm:h-44 flex-shrink-0">
+                              <img 
+                                src={product.image} 
+                                alt={product.nameAr} 
+                                className="w-full h-full rounded-2xl object-cover bg-slate-200" 
+                                loading="lazy"
+                                onError={handleImageError} 
+                              />
                               <button 
                                 onClick={(e) => toggleFavorite(product.id, e)}
-                                className={`absolute top-2 left-2 p-1.5 backdrop-blur rounded-full transition-colors ${isFav ? 'bg-red-50 text-red-500' : 'bg-white/80 text-slate-400 hover:text-red-500'}`}
+                                className={`absolute top-2 left-2 p-1.5 backdrop-blur rounded-full transition-colors hidden sm:block ${isFav ? 'bg-red-50 text-red-500' : 'bg-white/60 text-slate-600 hover:text-red-500 hover:text-red-500 hover:bg-white'}`}
                               >
                                 <Heart className={`w-4 h-4 ${isFav ? 'fill-red-500' : ''}`} />
                               </button>
                               {seller && (
-                                  <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur px-2 py-0.5 rounded text-[10px] text-white flex items-center gap-1">
-                                      <span className="font-bold">{seller.nameAr}</span>
+                                  <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur px-2 py-0.5 rounded-lg text-[10px] text-slate-800 shadow-sm hidden sm:flex items-center gap-1 font-bold">
+                                      {seller.nameAr}
                                   </div>
                               )}
                             </div>
-                            <h3 className="font-bold text-slate-800 text-sm md:text-base mb-1 truncate">{product.nameAr}</h3>
-                            <div className="flex justify-between items-center">
-                              <span className="text-amber-600 font-bold text-sm md:text-base">{product.price} ر.س</span>
-                              <div className="flex items-center gap-1 text-[10px] md:text-xs text-slate-400">
-                                <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                                <span>{product.rating}</span>
-                              </div>
+                            
+                            {/* Content */}
+                            <div className="flex-1 sm:mt-3 flex flex-col justify-between h-full sm:h-auto py-1 sm:py-0">
+                                <div>
+                                    <h3 className="font-bold text-slate-800 text-sm md:text-base mb-1 line-clamp-1 group-hover:text-amber-600 transition-colors">{product.nameAr}</h3>
+                                    <p className="text-xs text-slate-500 line-clamp-2 mb-2 hidden sm:block">{product.descriptionAr}</p>
+                                    {/* Mobile View Desc */}
+                                    <p className="text-[10px] text-slate-400 line-clamp-1 mb-1 sm:hidden">{product.descriptionAr}</p>
+                                </div>
+                                
+                                <div className="flex justify-between items-center mt-auto">
+                                    <span className="text-slate-900 font-bold text-sm md:text-base">{product.price} <span className="text-[10px] text-slate-500 font-normal">ر.س</span></span>
+                                    
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); addToCart(product); }}
+                                        className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-amber-500 hover:text-white transition-colors"
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </div>
                           </div>
                         );
@@ -701,33 +825,33 @@ export const App: React.FC = () => {
 
         {/* Bottom Navigation (Mobile Only) */}
         {activeView === 'home' || activeView === 'favorites' || activeView === 'profile' ? (
-             <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-between items-center z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-             <button onClick={() => { setActiveView('home'); triggerHaptic(); }} className={`flex flex-col items-center gap-1 ${activeView === 'home' ? 'text-amber-600' : 'text-slate-400'}`}>
+             <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-between items-center z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] pb-5">
+             <button onClick={() => { setActiveView('home'); triggerHaptic(); }} className={`flex flex-col items-center gap-1 transition-all ${activeView === 'home' ? 'text-amber-600 -translate-y-1' : 'text-slate-400'}`}>
                  <Home className={`w-6 h-6 ${activeView === 'home' ? 'fill-amber-100' : ''}`} />
-                 <span className="text-[10px] font-bold">الرئيسية</span>
+                 <span className={`text-[10px] font-bold ${activeView === 'home' ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'}`}>الرئيسية</span>
              </button>
-             <button onClick={() => { setActiveView('favorites'); triggerHaptic(); }} className={`flex flex-col items-center gap-1 ${activeView === 'favorites' ? 'text-amber-600' : 'text-slate-400 hover:text-slate-600'}`}>
+             <button onClick={() => { setActiveView('favorites'); triggerHaptic(); }} className={`flex flex-col items-center gap-1 transition-all ${activeView === 'favorites' ? 'text-amber-600 -translate-y-1' : 'text-slate-400 hover:text-slate-600'}`}>
                  <Heart className={`w-6 h-6 ${activeView === 'favorites' ? 'fill-amber-100' : ''}`} />
-                 <span className="text-[10px] font-medium">المفضلة</span>
+                 <span className={`text-[10px] font-bold ${activeView === 'favorites' ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'}`}>المفضلة</span>
              </button>
              
              {/* Voice Assistant FAB */}
              <div className="relative -top-6">
                  <button 
                  onClick={() => { setIsVoiceModalOpen(true); triggerHaptic(20); }}
-                 className="w-14 h-14 bg-gradient-to-tr from-amber-500 to-amber-400 rounded-full flex items-center justify-center text-white shadow-lg shadow-amber-500/30 hover:scale-105 active:scale-95 transition-transform"
+                 className="w-14 h-14 bg-slate-900 rounded-full flex items-center justify-center text-white shadow-lg shadow-slate-900/40 hover:scale-105 active:scale-95 transition-transform border-4 border-slate-50"
                  >
-                 <Mic className="w-7 h-7" />
+                 <Mic className="w-6 h-6" />
                  </button>
              </div>
 
-             <button onClick={navigateToProfile} className={`flex flex-col items-center gap-1 ${activeView === 'profile' ? 'text-amber-600' : 'text-slate-400 hover:text-slate-600'}`}>
+             <button onClick={navigateToProfile} className={`flex flex-col items-center gap-1 transition-all ${activeView === 'profile' ? 'text-amber-600 -translate-y-1' : 'text-slate-400 hover:text-slate-600'}`}>
                  <Clock className={`w-6 h-6 ${activeView === 'profile' ? 'fill-amber-100' : ''}`} />
-                 <span className="text-[10px] font-medium">طلباتي</span>
+                 <span className={`text-[10px] font-bold ${activeView === 'profile' ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'}`}>طلباتي</span>
              </button>
-             <button onClick={navigateToProfile} className={`flex flex-col items-center gap-1 ${activeView === 'profile' ? 'text-amber-600' : 'text-slate-400 hover:text-slate-600'}`}>
+             <button onClick={navigateToProfile} className={`flex flex-col items-center gap-1 transition-all ${activeView === 'profile' ? 'text-amber-600 -translate-y-1' : 'text-slate-400 hover:text-slate-600'}`}>
                  <UserIcon className={`w-6 h-6 ${activeView === 'profile' ? 'fill-amber-100' : ''}`} />
-                 <span className="text-[10px] font-medium">حسابي</span>
+                 <span className={`text-[10px] font-bold ${activeView === 'profile' ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'}`}>حسابي</span>
              </button>
            </nav>
         ) : null}
@@ -735,7 +859,7 @@ export const App: React.FC = () => {
         {/* Desktop Floating Mic Button */}
         <button 
             onClick={() => { setIsVoiceModalOpen(true); triggerHaptic(20); }}
-            className="hidden md:flex fixed bottom-8 left-8 z-40 bg-gradient-to-tr from-amber-500 to-amber-400 text-white p-4 rounded-full shadow-lg shadow-amber-500/30 hover:scale-110 active:scale-95 transition-all items-center gap-2"
+            className="hidden md:flex fixed bottom-8 left-8 z-40 bg-slate-900 text-white p-4 rounded-full shadow-lg shadow-slate-900/30 hover:scale-110 active:scale-95 transition-all items-center gap-2"
         >
             <Mic className="w-6 h-6" />
             <span className="font-bold text-sm">مساعد سفرة</span>

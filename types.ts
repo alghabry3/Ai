@@ -44,6 +44,10 @@ export interface Seller {
     deliveryTime: string;
     rating: number;
     image: string;
+    // Contact Info
+    phone?: string;
+    email?: string;
+    address?: string;
 }
 
 export interface CartItem {
